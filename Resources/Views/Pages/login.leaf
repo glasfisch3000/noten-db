@@ -1,0 +1,52 @@
+#extend("master"):
+	#export("head"):
+	<link rel="stylesheet" href="/css/login.css">
+	#if(success):
+	<meta http-equiv="refresh" content="1;url=#(return)"/>
+	#endif
+	#endexport
+	
+	#export("title"):
+	Anmelden
+	#endexport
+	
+	#export("body"):
+	<div id="login-panel">
+		<form id="login-form" name="login" method="post">
+			#if(success):
+			<section id="login-success">
+				Anmeldung erfolgreich
+			</section>
+			#else:
+			<section>
+				<label for="username">Benutzer</label>
+				<input id="username" type="text" required autofocus name="username" placeholder="Benutzername" title="Benutzername" autocomplete="username" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="password">Passwort</label>
+				<input id="password" type="password" required name="password" placeholder="Passwort" title="Passwort" autocomplete="password" inputmode="text"/>
+			</section>
+			
+			<section class="submit-section">
+				#if(error):
+				<section id="login-error">
+					#if(error == "unreadable"):
+					Fehler: Unlesbare oder falsch formatierte Daten. Das ist entweder ein Bug oder deine Schuld. Versuch es nochmal.
+					#elseif(error == "wrong"):
+					Falscher Benutzername oder Passwort. Versuch es nochmal.
+					#elseif(error == "internal"):
+					Ein interner Fehler ist aufgetreten. Das ist nicht so gedacht und wahrscheinlich ein Bug. Versuch es nochmal.
+					#else:
+					Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere den Entwickler und schrei ihn an. Oder versuch es nochmal.
+					#endif
+				</section>
+				#endif
+				
+				<input id="submit" type="submit" value="Anmelden" title="Anmelden"/>
+			</section>
+			#endif
+		</form>
+	</div>
+	#endexport
+#endextend

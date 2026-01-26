@@ -1,0 +1,59 @@
+#content {
+	display: grid;
+	grid-auto-columns: minmax(20em, auto);
+	gap: 1em;
+}
+
+.sheet-card {
+	border: 0.5px solid #8888;
+	border-radius: 1em;
+	overflow: hidden;
+}
+
+.sheet-card > .content {
+	padding: 0.7em;
+	padding-left: 1em;
+}
+
+.sheet-card > .extra {
+	border-top: 0.5px solid #8888;
+	
+	padding: 0.4em;
+	padding-right: 0.7em;
+	padding-left: 1em;
+	
+	background-color: #4443;
+}
+
+.sheet-card .sheet-info {
+	font-size: 80%;
+	opacity: 70%;
+}
+
+.sheet-card .sheet-info > .composer {
+	font-weight: bolder;
+}
+
+.sheet-card .sheet-info > .timestamp {
+	border: none;
+	border-radius: 0.5em;
+	
+	background: #5555;
+	
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+}
+
+.sheet-card .sheet-info > .timestamp > input {
+	display: none;
+}
+
+:is(.sheet-card .sheet-info > .timestamp > input:not(:checked)) ~ .absolute {
+	display: none;
+}
+
+:is(.sheet-card .sheet-info > .timestamp > input:checked) ~ .relative {
+	display: none;
+}

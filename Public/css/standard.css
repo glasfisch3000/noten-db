@@ -1,0 +1,166 @@
+body {
+	position: relative;
+	
+	width: 100vw;
+	height: 100vh;
+	
+	overflow: hidden;
+}
+
+#viewport {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	
+	width: 100%;
+	height: 100%;
+	
+	/* 2.4em left, right, top to match the header's rounded border
+	 + 2em bottom
+	 + 4.2em top */
+	padding-left: 2.4em;
+	padding-right: 2.4em;
+	padding-top: 5.6em;
+	padding-bottom: 2em;
+	box-sizing: border-box;
+	
+	overflow: auto;
+	overscroll-behavior: contain;
+	
+	clip-path: rect(1em 100% 100% 0);
+	-webkit-clip-path: rect(1em 100% 100% 0);
+}
+
+header {
+	position: fixed;
+	top: 0.7142857143em;
+	
+	margin-left: 0.7142857143em;
+	margin-right: 0.7142857143em;
+	
+	width: -webkit-fill-available;
+	width: stretch;
+	
+	z-index: 9;
+	
+	border: 1px solid #8888;
+	border-radius: 2em;
+	
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	
+	font-size: 140%;
+	font-weight: bolder;
+	
+	display: flex;
+	align-items: center;
+	
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+}
+
+header > .header-item {
+	border-radius: 2em;
+	
+	padding-top: 0.3em;
+	padding-bottom: 0.3em;
+	padding-left: 0.8em;
+	padding-right: 0.8em;
+	
+	vertical-align: middle;
+}
+
+header > .header-item:hover {
+	background: #4444;
+}
+
+header > button {
+	color: inherit;
+	background: inherit;
+	border: none;
+	font-size: inherit;
+}
+
+header #title {
+	color: #999;
+}
+
+header #new-sheet-button {
+	margin-left: auto;
+	margin-right: 0em;
+	
+	/* Make the border a circle */
+	padding: 0.3em;
+}
+
+header #new-sheet-button > object {
+	margin-bottom: -0.191em;
+	margin-left: 0.03em;
+	margin-right: 0.03em;
+	
+	width: 1.15em;
+	height: 1.15em;
+	
+	color: #eee;
+	
+	display: inline;
+}
+
+header #login {
+	margin-left: 0.5em;
+	margin-right: 0em;
+	
+	/* Make the border look concentric with the icon */
+	padding-right: 0.3em;
+}
+
+header #login > * {
+	display: inline;
+}
+
+header #login #username {
+	margin-top: -0.15em;
+	margin-bottom: -0.3em;
+	
+	box-sizing: border-box;
+	width: 0;
+	
+	background: linear-gradient(to left, #0000, #eee 0.5em);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	
+	opacity: 0%;
+	
+	transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
+	
+	display: inline-block;
+	display: inline flow-root;
+	
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* Only show the username on hover */
+header #login:hover #username {
+	opacity: 100%;
+	
+	/* Pfusch */
+	width: 5.1964285714em;
+	width: calc-size(auto, size);
+}
+
+header #login > #user-icon {
+	margin-top: -0.1em;
+	margin-bottom: -0.35em;
+	margin-left: -1.05em;
+	
+	width: 1.3em;
+	height: 1.3em;
+	
+	color: #eee;
+}

@@ -1,0 +1,26 @@
+#extend("standard"):
+	#export("standard-head"):
+	<link rel="stylesheet" href="/css/index.css">
+	#endexport
+	
+	#export("title"):
+	Notenarchiv
+	#endexport
+	
+	#export("content"):
+	#for(sheet in sheets):
+	<div class="sheet-card">
+		<div class="content">
+			#(sheet.title)
+		</div>
+		<div class="extra">
+			<div class="sheet-info">
+				<span class="composer">
+					#(sheet.composer)
+				</span>
+			</div>
+		</div>
+	</div>
+	#endfor
+	#endexport
+#endextend

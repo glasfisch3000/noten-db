@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/css/style.css">
+	#import("head")
+	<title>#import("title")</title>
+</head>
+
+<body>
+	#import("body")
+</body>
+</html>

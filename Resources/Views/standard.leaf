@@ -1,0 +1,25 @@
+#extend("master"):
+	#export("head"):
+	<link rel="stylesheet" href="/css/standard.css">
+	#import("standard-head")
+	#endexport
+	
+	#export("body"):
+	<header>
+		<div id="title" class="header-item">Notenarchiv</div>
+		<button id="new-sheet-button" class="header-item">
+			<object data="/svg/plus.svg" type="image/svg+xml"></object>
+		</button>
+		<div id="login" class="header-item">
+			<div id="username">#(username)</div>
+			<object id="user-icon" data="/svg/person.circle.svg" type="image/svg+xml"></object>
+		</div>
+	</header>
+	
+	<div id="viewport">
+		<div id="content">
+			#import("content")
+		</div>
+	</div>
+	#endexport
+#endextend
