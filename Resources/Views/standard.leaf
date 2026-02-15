@@ -7,12 +7,12 @@
 	#export("body"):
 	<header>
 		<div id="title" class="header-item">Notenarchiv</div>
-		<button id="new-sheet-button" class="header-item">
-			<object data="/svg/plus.svg" type="image/svg+xml"></object>
-		</button>
+		<a id="new-sheet-button" class="header-item" href="/upload">
+			<img src="/svg/plus.svg"/>
+		</a>
 		<div id="login" class="header-item">
 			<div id="username">#(username)</div>
-			<object id="user-icon" data="/svg/person.circle.svg" type="image/svg+xml"></object>
+			<img id="user-icon" src="/svg/person.circle.svg"/>
 		</div>
 	</header>
 	

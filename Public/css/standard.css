@@ -78,7 +78,7 @@ header > .header-item:hover {
 	background: #4444;
 }
 
-header > button {
+header > button, header > a {
 	color: inherit;
 	background: inherit;
 	border: none;
@@ -97,8 +97,8 @@ header #new-sheet-button {
 	padding: 0.3em;
 }
 
-header #new-sheet-button > object {
-	margin-bottom: -0.191em;
+header #new-sheet-button > img {
+	margin-bottom: -0.25em;
 	margin-left: 0.03em;
 	margin-right: 0.03em;
 	
