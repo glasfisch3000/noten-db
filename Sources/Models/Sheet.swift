@@ -13,6 +13,9 @@ final class Sheet: Model, @unchecked Sendable {
 	@Field(key: "composer")
 	var composer: String?
 	
+	@Field(key: "arranger")
+	var arranger: String?
+	
 	@Field(key: "year")
 	var year: Int?
 	
@@ -21,10 +24,11 @@ final class Sheet: Model, @unchecked Sendable {
 	
 	init() { }
 	
-	init(id: UUID? = nil, title: String, composer: String?, year: Int?, createdBy: User.IDValue) {
+	init(id: UUID? = nil, title: String, composer: String?, arranger: String?, year: Int?, createdBy: User.IDValue) {
 		self.id = id
 		self.title = title
 		self.composer = composer
+		self.arranger = arranger
 		self.year = year
 		self.$createdBy.id = createdBy
 	}
@@ -36,6 +40,7 @@ struct CreateSheetMigration: AsyncMigration {
 			.id()
 			.field("title", .string, .required)
 			.field("composer", .string)
+			.field("arranger", .string)
 			.field("year", .int)
 			.field("created_by", .uuid, .required, .references("users", .id))
 			.create()
