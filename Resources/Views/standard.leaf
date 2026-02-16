@@ -6,10 +6,12 @@
 	
 	#export("body"):
 	<header>
-		<div id="title" class="header-item">Notenarchiv</div>
+		<a id="title" class="header-item" href="/">Notenarchiv</a>
+		
 		<a id="new-sheet-button" class="header-item" href="/upload">
 			<img src="/svg/plus.svg"/>
 		</a>
+		
 		<div id="login" class="header-item">
 			<div id="username">#(username)</div>
 			<img id="user-icon" src="/svg/person.circle.svg"/>

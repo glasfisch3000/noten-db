@@ -83,6 +83,7 @@ header > button, header > a {
 	background: inherit;
 	border: none;
 	font-size: inherit;
+	text-decoration: none;
 }
 
 header #title {
