@@ -1,0 +1,64 @@
+#extend("standard"):
+	#export("standard-head"):
+	<link rel="stylesheet" href="/css/upload.css">
+	#endexport
+	
+	#export("title"):
+	Notenarchiv - Upload
+	#endexport
+	
+	#export("content"):
+	<div id="input-panel">
+		<form id="input-form" name="input" method="post" enctype="multipart/form-data">
+			#if(success):
+			<section id="upload-success">
+				Datei gespeichert
+			</section>
+			#else:
+			<section>
+				<label for="title">Titel</label>
+				<input id="title" type="text" required autofocus name="title" placeholder="Titel" title="Titel" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="composer">Komponist</label>
+				<input id="composer" type="text" name="composer" placeholder="Komponist" title="Komponist" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="arranger">Satz</label>
+				<input id="arranger" type="text" name="arranger" placeholder="Satz" title="Satz" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="year">Jahr</label>
+				<input id="year" type="number" name="year" placeholder="Jahr" title="Jahr" inputmode="numeric"/>
+			</section>
+			
+			<section>
+				<label for="file">Datei</label>
+				<input id="file" type="file" accept=".pdf" name="file" placeholder="Datei" title="Datei"/>
+			</section>
+			
+			<section class="submit-section">
+				#if(error):
+				<section id="upload-error">
+					#if(error == "unreadable"):
+					Fehler: Unlesbare oder falsch formatierte Daten. Das ist entweder ein Bug oder deine Schuld. Versuch es nochmal.
+					#elseif(error == "internal"):
+					Ein interner Fehler ist aufgetreten. Das ist nicht so gedacht und wahrscheinlich ein Bug. Versuch es nochmal.
+					#elseif(error == "tooLarge"):
+					Die ausgewählte Datei ist zu groß.
+					#else:
+					Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere den Entwickler und schrei ihn an. Oder versuch es nochmal.
+					#endif
+				</section>
+				#endif
+				
+				<input id="submit" type="submit" value="Speichern" title="Speichern"/>
+			</section>
+			#endif
+		</form>
+	</div>
+	#endexport
+#endextend

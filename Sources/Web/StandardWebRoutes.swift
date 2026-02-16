@@ -1,14 +1,21 @@
 import Vapor
 import Leaf
 import Fluent
+import NIOCore
 
 struct StandardWebRoutes: RouteCollection {
 	enum RequestError: Error {
 		case invalidPagingSize(UInt)
+		case tooLarge
 	}
+	
+	var storage: FileStorage
 	
 	func boot(routes: any RoutesBuilder) throws {
 		routes.get(use: index(request:))
+		
+		routes.get("upload", use: upload(request:))
+		routes.on(.POST, "upload", body: .stream, use: postUpload(request:))
 	}
 	
 	func index(request: Request) async throws -> View {
@@ -70,5 +77,86 @@ struct StandardWebRoutes: RouteCollection {
 		)
 		
 		return try await request.view.render("Pages/index", context)
+	}
+	
+	func upload(request: Request) async throws -> View {
+		struct Context: Codable {
+			var username: String
+		}
+		
+		guard let user = request.auth.get(User.self) else {
+			throw AuthError.missingLogin
+		}
+		let context = Context(username: user.username)
+		
+		return try await request.view.render("Pages/upload", context)
+	}
+	
+	func postUpload(request: Request) async throws -> View {
+		struct UploadData: Codable {
+			var title: String
+			var composer: String?
+			var arranger: String?
+			var year: Int?
+			var file: Data
+		}
+		
+		struct Context: Codable {
+			enum PostError: String, Error, Codable {
+				case unreadable
+				case tooLarge
+				case `internal`
+			}
+			
+			var username: String
+			var success: Bool
+			var error: PostError? = nil
+		}
+		
+		// authenticate
+		guard let user = request.auth.get(User.self) else {
+			throw AuthError.missingLogin
+		}
+		
+		// collect data
+		let uploadData: UploadData
+		do {
+			let buffer = if let data = request.body.data {
+				data
+			} else {
+				try await request.body.collect(upTo: 10_000_000) // max 10MB
+			}
+			
+			let decoder = try ContentConfiguration.global.requireDecoder(for: .formData)
+			uploadData = try decoder.decode(UploadData.self, from: buffer, headers: request.headers)
+		} catch _ as NIOTooManyBytesError {
+			let context = Context(username: user.username, success: false, error: .tooLarge)
+			return try await request.view.render("Pages/upload", context)
+		} catch {
+			let context = Context(username: user.username, success: false, error: .unreadable)
+			return try await request.view.render("Pages/upload", context)
+		}
+		
+		// try to store data in database and file at once. if one fails, return an error page
+		do {
+			return try await request.db.transaction { db in
+				let sheet = Sheet(
+					title: uploadData.title,
+					composer: uploadData.composer,
+					arranger: uploadData.arranger,
+					year: uploadData.year,
+					createdBy: try user.requireID()
+				)
+				try await sheet.create(on: db)
+				
+				try await storage.create(sheetID: try sheet.requireID(), contents: uploadData.file)
+				
+				let context = Context(username: user.username, success: true)
+				return try await request.view.render("Pages/upload", context)
+			}
+		} catch {
+			let context = Context(username: user.username, success: false, error: .internal)
+			return try await request.view.render("Pages/upload", context)
+		}
 	}
 }

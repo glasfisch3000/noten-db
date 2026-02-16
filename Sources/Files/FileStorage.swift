@@ -1,6 +1,9 @@
 import NIOFileSystem
+import Foundation
 
 final class FileStorage: Sendable {
+	struct FileExistsError: Error { }
+	
 	let fs = FileSystem.shared
 	let parentDir: FilePath
 	
@@ -37,5 +40,14 @@ final class FileStorage: Sendable {
 	func remove(sheetID: Sheet.IDValue) async throws {
 		let dir = parentDir.appending(sheetID.uuidString)
 		try await fs.removeItem(at: dir)
+	}
+	
+	func create(sheetID: Sheet.IDValue, contents: Data) async throws {
+		let dir = parentDir.appending(sheetID.uuidString)
+		guard try await fs.info(forFileAt: dir) == nil else {
+			throw FileExistsError()
+		}
+		
+		try await contents.write(toFileAt: dir, options: .newFile(replaceExisting: false))
 	}
 }

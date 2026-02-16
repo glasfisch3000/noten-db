@@ -87,7 +87,7 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 		
 		try app.routes
 			.grouped(app.sessions.middleware)
-			.register(collection: WebRoutes())
+			.register(collection: WebRoutes(storage: storage))
 		
 		return (app, storage)
 	} catch {

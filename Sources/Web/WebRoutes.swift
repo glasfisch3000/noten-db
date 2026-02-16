@@ -3,6 +3,8 @@ import Leaf
 import Fluent
 
 struct WebRoutes: RouteCollection {
+	var storage: FileStorage
+	
 	func boot(routes: any RoutesBuilder) throws {
 		routes
 			.grouped(SessionAuthenticator())
@@ -11,7 +13,7 @@ struct WebRoutes: RouteCollection {
 		try routes
 			.grouped(ErrorMiddleware())
 			.grouped(SessionAuthenticator(strict: true))
-			.register(collection: StandardWebRoutes())
+			.register(collection: StandardWebRoutes(storage: storage))
 	}
 	
 	func configureLogin(routes: RoutesBuilder) {
