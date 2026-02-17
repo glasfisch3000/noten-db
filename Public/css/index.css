@@ -1,6 +1,6 @@
 #content {
 	display: grid;
-	grid-auto-columns: minmax(20em, auto);
+	grid-template-columns: repeat(auto-fill, 12em);
 	gap: 1em;
 }
 
@@ -11,49 +11,44 @@
 }
 
 .sheet-card > .content {
-	padding: 0.7em;
-	padding-left: 1em;
+	margin: 0;
+	padding: 0;
+	max-height: 10em;
+	display: flex;
+	overflow: hidden;
 }
 
-.sheet-card > .extra {
+.sheet-card > .content > img {
+	margin: auto;
+	max-width: 100%;
+	background: #fff;
+}
+
+.sheet-info {
 	border-top: 0.5px solid #8888;
 	
-	padding: 0.4em;
-	padding-right: 0.7em;
-	padding-left: 1em;
+	padding-top: 0.3em;
+	padding-left: 0.7em;
+	padding-right: 0.6em;
+	padding-bottom: 0.5em;
 	
 	background-color: #4443;
+	
+	font-size: 85%;
+	opacity: 90%;
 }
 
-.sheet-card .sheet-info {
-	font-size: 80%;
-	opacity: 70%;
-}
-
-.sheet-card .sheet-info > .composer {
+.sheet-info > .title {
 	font-weight: bolder;
 }
 
-.sheet-card .sheet-info > .timestamp {
-	border: none;
-	border-radius: 0.5em;
-	
-	background: #5555;
-	
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	padding-top: 0.2em;
-	padding-bottom: 0.2em;
+.sheet-info > .other-info {
+	margin-top: 0.3em;
+	font-size: 80%;
+	opacity: 80%;
 }
 
-.sheet-card .sheet-info > .timestamp > input {
-	display: none;
-}
-
-:is(.sheet-card .sheet-info > .timestamp > input:not(:checked)) ~ .absolute {
-	display: none;
-}
-
-:is(.sheet-card .sheet-info > .timestamp > input:checked) ~ .relative {
-	display: none;
+.sheet-info > .other-info > .composer, .sheet-info > .other-info > .arranger {
+	font-weight: bolder;
+	opacity: 120%;
 }

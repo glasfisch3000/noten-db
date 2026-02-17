@@ -11,14 +11,28 @@
 	#for(sheet in sheets):
 	<div class="sheet-card">
 		<div class="content">
-			#(sheet.title)
+			<img src="/file/#(sheet.id)" load="lazy" decoding="async"/>
 		</div>
-		<div class="extra">
-			<div class="sheet-info">
-				<span class="composer">
-					#(sheet.composer)
-				</span>
+		<div class="sheet-info">
+			<div class="title">
+				#(sheet.title)
 			</div>
+			
+			#if(sheet.composer || sheet.arranger || sheet.year):
+			<div class="other-info">
+				#if(sheet.composer):
+				<span class="composer">#(sheet.composer)</span>
+				#endif
+				
+				#if(sheet.composer && sheet.arranger):
+				<br>
+				#endif
+				
+				#if(sheet.arranger):
+				Satz: <span class="arranger">#(sheet.arranger)</span>
+				#endif
+			</div>
+			#endif
 		</div>
 	</div>
 	#endfor

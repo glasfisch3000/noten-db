@@ -7,6 +7,7 @@ struct StandardWebRoutes: RouteCollection {
 	enum RequestError: Error {
 		case invalidPagingSize(UInt)
 		case tooLarge
+		case invalidFormat
 	}
 	
 	var storage: FileStorage
@@ -25,8 +26,10 @@ struct StandardWebRoutes: RouteCollection {
 					var username: String
 				}
 				
+				var id: UUID
 				var title: String
 				var composer: String?
+				var arranger: String?
 				var year: Int?
 				var creator: Creator
 			}
@@ -61,10 +64,12 @@ struct StandardWebRoutes: RouteCollection {
 		
 		let context = Context(
 			username: user.username,
-			sheets: sheets.items.map {
+			sheets: try sheets.items.map {
 				Context.Sheet(
+					id: try $0.requireID(),
 					title: $0.title,
 					composer: $0.composer,
+					arranger: $0.arranger,
 					creator: Context.Sheet.Creator(
 						username: $0.createdBy.username
 					)
@@ -97,7 +102,7 @@ struct StandardWebRoutes: RouteCollection {
 			var title: String
 			var composer: String?
 			var arranger: String?
-			var year: Int?
+			var year: String?
 			var file: Data
 		}
 		
@@ -120,6 +125,7 @@ struct StandardWebRoutes: RouteCollection {
 		
 		// collect data
 		let uploadData: UploadData
+		let year: Int?
 		do {
 			let buffer = if let data = request.body.data {
 				data
@@ -128,7 +134,34 @@ struct StandardWebRoutes: RouteCollection {
 			}
 			
 			let decoder = try ContentConfiguration.global.requireDecoder(for: .formData)
-			uploadData = try decoder.decode(UploadData.self, from: buffer, headers: request.headers)
+			var decoded = try decoder.decode(UploadData.self, from: buffer, headers: request.headers)
+			
+			if decoded.title.isEmpty {
+				throw RequestError.invalidFormat
+			}
+			
+			if let composer = decoded.composer, composer.isEmpty {
+				decoded.composer = nil
+			}
+			
+			if let arranger = decoded.arranger, arranger.isEmpty {
+				decoded.arranger = nil
+			}
+			
+			print(decoded)
+			year = if let string = decoded.year {
+				if string.isEmpty {
+					nil
+				} else if let parsed = Int(string) {
+					parsed
+				} else {
+					throw RequestError.invalidFormat
+				}
+			} else {
+				nil
+			}
+			
+			uploadData = decoded
 		} catch _ as NIOTooManyBytesError {
 			let context = Context(username: user.username, success: false, error: .tooLarge)
 			return try await request.view.render("Pages/upload", context)
@@ -144,7 +177,7 @@ struct StandardWebRoutes: RouteCollection {
 					title: uploadData.title,
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
-					year: uploadData.year,
+					year: year,
 					createdBy: try user.requireID()
 				)
 				try await sheet.create(on: db)
