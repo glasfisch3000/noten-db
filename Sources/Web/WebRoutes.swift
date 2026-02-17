@@ -14,6 +14,10 @@ struct WebRoutes: RouteCollection {
 			.grouped(ErrorMiddleware())
 			.grouped(SessionAuthenticator(strict: true))
 			.register(collection: StandardWebRoutes(storage: storage))
+		
+		routes
+			.grouped(SessionAuthenticator(strict: true))
+			.get("file", ":id", use: getFile(request:))
 	}
 	
 	func configureLogin(routes: RoutesBuilder) {
@@ -77,5 +81,17 @@ struct WebRoutes: RouteCollection {
 				return try await req.view.render("Pages/login", Context(error: .internal, return: returnPath))
 			}
 		}
+	}
+	
+	func getFile(request: Request) async throws -> Response {
+		guard let id = request.parameters.get("id", as: UUID.self) else {
+			throw Abort(.notFound)
+		}
+		
+		guard let data = try await storage.read(sheetID: id) else {
+			throw Abort(.notFound)
+		}
+		
+		return Response(body: .init(data: data))
 	}
 }

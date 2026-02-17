@@ -26,15 +26,13 @@ final class FileStorage: Sendable {
 		return (dir, info)
 	}
 	
-	func read(sheetID: Sheet.IDValue) async throws -> FileChunks? {
+	func read(sheetID: Sheet.IDValue) async throws -> Data? {
 		let dir = parentDir.appending(sheetID.uuidString)
 		if try await fs.info(forFileAt: dir) == nil {
 			return nil
 		}
 		
-		return try await fs.withFileHandle(forReadingAt: dir) { handle in
-			handle.readChunks()
-		}
+		return try await Data(contentsOf: dir, maximumSizeAllowed: .megabytes(100))
 	}
 	
 	func remove(sheetID: Sheet.IDValue) async throws {
