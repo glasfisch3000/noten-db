@@ -11,7 +11,7 @@ struct ErrorMiddleware: AsyncMiddleware {
 				.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
 				.flatMap { "?return=\($0)" }
 			
-			return request.redirect(to: "login\(query ?? "")")
+			return request.redirect(to: "/login\(query ?? "")")
 		}
 	}
 }
