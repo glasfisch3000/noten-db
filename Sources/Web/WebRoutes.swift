@@ -12,12 +12,10 @@ struct WebRoutes: RouteCollection {
 		
 		try routes
 			.grouped(ErrorMiddleware())
-			.grouped(SessionAuthenticator(strict: true))
-			.register(collection: StandardWebRoutes(storage: storage))
-		
-		routes
-			.grouped(SessionAuthenticator(strict: true))
-			.get("file", ":id", use: getFile(request:))
+			.group(SessionAuthenticator(strict: true)) { group in
+				group.get("file", ":id", use: getFile(request:))
+				try group.register(collection: StandardWebRoutes(storage: storage))
+			}
 	}
 	
 	func configureLogin(routes: RoutesBuilder) {
@@ -88,10 +86,10 @@ struct WebRoutes: RouteCollection {
 			throw Abort(.notFound)
 		}
 		
-		guard let data = try await storage.read(sheetID: id) else {
+		guard let (path, _) = try await storage.getInfo(sheetID: id) else {
 			throw Abort(.notFound)
 		}
 		
-		return Response(body: .init(data: data))
+		return try await request.fileio.asyncStreamFile(at: path.string, mediaType: .pdf, advancedETagComparison: true)
 	}
 }
