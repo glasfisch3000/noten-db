@@ -1,6 +1,9 @@
 #extend("standard"):
 	#export("standard-head"):
 	<link rel="stylesheet" href="/css/upload.css">
+	#if(success):
+	<meta http-equiv="refresh" content="1"/>
+	#endif
 	#endexport
 	
 	#export("title"):
