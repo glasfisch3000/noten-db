@@ -2,6 +2,11 @@
 	color-scheme: dark;
 }
 
+@font-face {
+	font-family: SFPro;
+	src: url('/fonts/SF-Pro-Text-Regular.otf');
+}
+
 body {
 	margin: 0px;
 	
@@ -10,28 +15,44 @@ body {
 	font-family: "Courier";
 }
 
-input {
-	border: 0.5px solid #80808080;
+input, a.submit-button {
+	border: 0.5px solid;
 	border-radius: 0.3em;
 	padding-left: 0.6em;
 	padding-right: 0.6em;
 	padding-top: 0.35em;
 	padding-bottom: 0.35em;
 	
-	background-color: inherit;
-	color: inherit;
-	
 	font-size: inherit;
 	font-family: inherit;
+	text-decoration: inherit;
 }
 
-button, input[type=submit] {
+input:not(.submit-button) {
+	border-color: #80808080;
+	background-color: inherit;
+	color: inherit;
+}
+
+.submit-button {
+	width: 100%;
+	display: inline-block;
+	box-sizing: border-box;
+	
 	border-color: #9a55a3;
 	background-color: #3333;
 	color: #9a55a3;
+	
+	text-align: center;
+	cursor: pointer;
 }
 
-button, input[type=submit]:hover {
+.submit-button:hover {
+	border-color: #9a55a3;
 	background-color: #9a55a3;
 	color: inherit;
+}
+
+.symbol {
+	font-family: SFPro;
 }

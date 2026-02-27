@@ -8,9 +8,58 @@
 	border: 0.5px solid #8888;
 	border-radius: 1em;
 	overflow: hidden;
+	
+	position: relative;
 }
 
-.sheet-card > .content {
+.sheet-card a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.sheet-card .buttons {
+	position: absolute;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	padding-right: 0.8em;
+	padding-left: 0.8em;
+	box-sizing: border-box;
+	
+	display: grid;
+	grid-template-columns: repeat(auto-fit, 1.7em);
+	gap: 0.2em;
+	justify-content: end;
+	
+	width: 100%;
+}
+
+.sheet-card .buttons > * {
+	padding: 0.2em;
+	border-radius: 0.3em;
+	background: #222;
+	color: #aaa;
+	
+	width: 1.3em;
+	height: 1.3em;
+	text-align: center;
+	align-content: center;
+	
+	cursor: pointer;
+}
+
+.sheet-card .buttons > a:hover, .sheet-card .buttons button:hover {
+	color: inherit;
+}
+
+.sheet-card .buttons > a:active, .sheet-card .buttons button:active {
+	background: #555;
+}
+
+.sheet-card .buttons > .trash:hover {
+	color: #f44;
+}
+
+.sheet-card .content {
 	margin: 0;
 	padding: 0;
 	max-height: 10em;
@@ -18,13 +67,13 @@
 	overflow: hidden;
 }
 
-.sheet-card > .content > img {
+.sheet-card .content img {
 	margin: auto;
 	max-width: 100%;
 	background: #fff;
 }
 
-.sheet-info {
+.sheet-card .info {
 	border-top: 0.5px solid #8888;
 	
 	padding-top: 0.3em;
@@ -38,17 +87,17 @@
 	opacity: 90%;
 }
 
-.sheet-info > .title {
+.sheet-card .info .title {
 	font-weight: bolder;
 }
 
-.sheet-info > .other-info {
+.sheet-card .info .other-info {
 	margin-top: 0.3em;
 	font-size: 80%;
 	opacity: 80%;
 }
 
-.sheet-info > .other-info > .composer, .sheet-info > .other-info > .arranger {
+.sheet-card .info .composer, .sheet-card .info .arranger {
 	font-weight: bolder;
 	opacity: 120%;
 }

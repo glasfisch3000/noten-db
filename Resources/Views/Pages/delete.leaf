@@ -1,0 +1,53 @@
+#extend("standard"):
+	#export("standard-head"):
+	<link rel="stylesheet" href="/css/delete-item.css">
+	#if(success):
+	<meta http-equiv="refresh" content="1;url=#(return)"/>
+	#endif
+	#endexport
+	
+	#export("title"):
+	Notenarchiv - Datei löschen
+	#endexport
+	
+	#export("content"):
+	<div id="delete-panel">
+		<form id="delete-form" name="delete" method="post">
+			#if(success):
+			<section id="delete-success">
+				Datei wurde gelöscht
+			</section>
+			
+			#else:
+			<section id="sheet-info">
+				<div id="sheet-preview">
+					<img src="/file/#(sheet.id)">
+				</div>
+				<div id="sheet-info-text">
+					<div id="sheet-title"> #(sheet.title) </div>
+					
+					#if(sheet.composer):
+					<div id="sheet-composer"> #(sheet.composer) </div>
+					#endif
+					
+					#if(sheet.arranger):
+					<div id="sheet-arranger"> #(sheet.arranger) </div>
+					#endif
+				</div>
+			</section>
+			
+			<section id="buttons">
+				#if(success==false):
+				<div id="delete-error"
+				Joa hat nicht geklappt
+				</div>
+				#endif
+				
+				<input id="submit" class="submit-button" type="submit" value="Löschen" title="Abbrechen"/>
+				<a id="cancel" class="submit-button" href="#(return)"> Abbrechen </a>
+			</section>
+			#endif
+		</form>
+	</div>
+	#endexport
+#endextend

@@ -43,7 +43,7 @@
 				</section>
 				#endif
 				
-				<input id="submit" type="submit" value="Anmelden" title="Anmelden"/>
+				<input id="submit" class="submit-button" type="submit" value="Anmelden" title="Anmelden"/>
 			</section>
 			#endif
 		</form>

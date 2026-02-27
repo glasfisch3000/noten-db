@@ -19,10 +19,6 @@ struct WebRoutes: RouteCollection {
 	}
 	
 	func configureLogin(routes: RoutesBuilder) {
-		struct Query: Codable {
-			var `return`: String
-		}
-		
 		struct Context: Codable {
 			var success: Bool = false
 			var error: PostError? = nil
@@ -40,14 +36,18 @@ struct WebRoutes: RouteCollection {
 			var password: String
 		}
 		
+		@Sendable
+		func parseReturnPath(_ request: Request) -> String? {
+			try? request.query.get(String.self, at: "return")
+		}
+		
 		routes.get { req -> View in
-			let query = try? req.query.decode(Query.self)
-			return try await req.view.render("Pages/login", Context(return: query?.return ?? "/"))
+			let returnPath = parseReturnPath(req) ?? "/"
+			return try await req.view.render("Pages/login", Context(return: returnPath))
 		}
 		
 		routes.post { req -> View in
-			let query = try? req.query.decode(Query.self)
-			let returnPath = query?.return ?? "/"
+			let returnPath = parseReturnPath(req) ?? "/"
 			
 			do {
 				guard let buffer = try? await req.body.collect(upTo: 1_000) else {

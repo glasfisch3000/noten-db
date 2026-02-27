@@ -55,7 +55,7 @@
 				</section>
 				#endif
 				
-				<input id="submit" type="submit" value="Speichern" title="Speichern"/>
+				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
 			</section>
 			#endif
 		</form>
