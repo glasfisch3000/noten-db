@@ -1,6 +1,5 @@
 #extend("master"):
 	#export("head"):
-	<link rel="stylesheet" href="/css/login.css">
 	#if(success):
 	<meta http-equiv="refresh" content="1;url=#(return)"/>
 	#endif
@@ -11,13 +10,13 @@
 	#endexport
 	
 	#export("body"):
-	<div id="login-panel">
+	#if(success):
+	<div class="panel success">
+		Anmeldung erfolgreich
+	</div>
+	#else:
+	<div class="panel">
 		<form id="login-form" name="login" method="post">
-			#if(success):
-			<section id="login-success">
-				Anmeldung erfolgreich
-			</section>
-			#else:
 			<section>
 				<label for="username">Benutzer</label>
 				<input id="username" type="text" required autofocus name="username" placeholder="Benutzername" title="Benutzername" autocomplete="username" inputmode="text"/>
@@ -30,7 +29,7 @@
 			
 			<section class="submit-section">
 				#if(error):
-				<section id="login-error">
+				<div class="error">
 					#if(error == "unreadable"):
 					Fehler: Unlesbare oder falsch formatierte Daten. Das ist entweder ein Bug oder deine Schuld. Versuch es nochmal.
 					#elseif(error == "wrong"):
@@ -40,13 +39,13 @@
 					#else:
 					Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere den Entwickler und schrei ihn an. Oder versuch es nochmal.
 					#endif
-				</section>
+				</div>
 				#endif
 				
 				<input id="submit" class="submit-button" type="submit" value="Anmelden" title="Anmelden"/>
 			</section>
-			#endif
 		</form>
 	</div>
+	#endif
 	#endexport
 #endextend

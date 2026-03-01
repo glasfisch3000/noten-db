@@ -1,34 +1,8 @@
-/* center the login panel on the page */
-#content {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-#delete-panel {
-	border: 1px solid #8888;
-	border-radius: 1em;
-	
-	width: 60%;
-}
-
-#delete-form {
-	margin: 1em;
-	
-	display: block;
-}
-
-#delete-success {
-	color: #0f0;
-}
-
 #sheet-info {
 	display: grid;
 	grid-template-columns: 9em 1fr;
 	align-items: center;
 	gap: 1em;
-	
-	margin-bottom: 1.5em;
 	
 	padding-top: 0.2em;
 	padding-left: 0.5em;
@@ -49,24 +23,19 @@
 }
 
 #sheet-info-text {
-	display: block;
-	padding: 0.5em;
+	font-weight: bolder;
+}
+#sheet-info-text > *:not(:last-child) {
+	/* spacing between the lines */
+	margin-bottom: 0.1em;
 }
 
 #sheet-title {
 	font-size: 140%;
-	font-weight: bolder;
-}
-#sheet-title:not(::last-child) {
-	margin-bottom: 0.5em;
 }
 
 #sheet-composer, #sheet-arranger {
 	opacity: 80%;
-	font-weight: bolder;
-}
-(#sheet-composer, #sheet-arranger):not(::last-child) {
-	margin-bottom: 0.1em;
 }
 
 #sheet-arranger::before {
@@ -74,24 +43,11 @@
 	font-weight: normal;
 }
 
-#buttons > *:not(:last-child) {
-	margin-bottom: 0.5em;
+#buttons > *:not(:first-child) {
+	margin-top: 0.5em;
 }
 
-#delete-error {
-	border: 0.5px solid #e22a;
-	border-radius: 0.3em;
-	padding-left: 0.6em;
-	padding-right: 0.6em;
-	padding-top: 0.35em;
-	padding-bottom: 0.35em;
-	
-	margin-bottom: 1em !important;
-	
-	font-size: 80%;
-	color: #e22;
-}
-
+/* make the delete button red */
 #submit {
 	border-color: #e22;
 	color: #e22;

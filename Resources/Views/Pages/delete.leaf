@@ -11,14 +11,13 @@
 	#endexport
 	
 	#export("content"):
-	<div id="delete-panel">
+	#if(success):
+	<div class="panel success">
+	Datei wurde gelöscht
+	</div>
+	#else:
+	<div class="panel">
 		<form id="delete-form" name="delete" method="post">
-			#if(success):
-			<section id="delete-success">
-				Datei wurde gelöscht
-			</section>
-			
-			#else:
 			<section id="sheet-info">
 				<div id="sheet-preview">
 					<img src="/file/#(sheet.id)">
@@ -36,9 +35,9 @@
 				</div>
 			</section>
 			
-			<section id="buttons">
+			<section id="buttons" class="submit-section">
 				#if(success==false):
-				<div id="delete-error"
+				<div class="error">
 				Joa hat nicht geklappt
 				</div>
 				#endif
@@ -46,8 +45,8 @@
 				<input id="submit" class="submit-button" type="submit" value="Löschen" title="Abbrechen"/>
 				<a id="cancel" class="submit-button" href="#(return)"> Abbrechen </a>
 			</section>
-			#endif
 		</form>
 	</div>
+	#endif
 	#endexport
 #endextend

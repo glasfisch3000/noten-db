@@ -1,6 +1,5 @@
 #extend("standard"):
 	#export("standard-head"):
-	<link rel="stylesheet" href="/css/upload.css">
 	#if(success):
 	<meta http-equiv="refresh" content="1"/>
 	#endif
@@ -11,13 +10,13 @@
 	#endexport
 	
 	#export("content"):
-	<div id="input-panel">
+	#if(success):
+	<div class="panel success">
+	Datei gespeichert
+	</div>
+	#else:
+	<div class="panel">
 		<form id="input-form" name="input" method="post" enctype="multipart/form-data">
-			#if(success):
-			<section id="upload-success">
-				Datei gespeichert
-			</section>
-			#else:
 			<section>
 				<label for="title">Titel</label>
 				<input id="title" type="text" required autofocus name="title" placeholder="Titel" title="Titel" inputmode="text"/>
@@ -45,7 +44,7 @@
 			
 			<section class="submit-section">
 				#if(error):
-				<section id="upload-error">
+				<div class="error">
 					#if(error == "unreadable"):
 					Fehler: Unlesbare oder falsch formatierte Daten. Das ist entweder ein Bug oder deine Schuld. Versuch es nochmal.
 					#elseif(error == "internal"):
@@ -55,13 +54,13 @@
 					#else:
 					Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere den Entwickler und schrei ihn an. Oder versuch es nochmal.
 					#endif
-				</section>
+				</div>
 				#endif
 				
 				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
 			</section>
-			#endif
 		</form>
 	</div>
+	#endif
 	#endexport
 #endextend
