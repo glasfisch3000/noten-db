@@ -1,8 +1,6 @@
 #sheet-info {
-	display: grid;
-	grid-template-columns: 9em 1fr;
+	display: flex;
 	align-items: center;
-	gap: 1em;
 	
 	padding-top: 0.2em;
 	padding-left: 0.5em;
@@ -11,10 +9,13 @@
 }
 
 #sheet-preview {
-	max-height: 5em;
-	overflow: hidden;
+	min-width: 9em;
+	max-width: 9em;
+	height: 5em;
+	overflow-y: hidden;
 	
 	border-radius: 0.5em;
+	margin-right: 1em;
 }
 
 #sheet-preview img {
@@ -24,6 +25,7 @@
 
 #sheet-info-text {
 	font-weight: bolder;
+	min-width: 0;
 }
 #sheet-info-text > *:not(:last-child) {
 	/* spacing between the lines */
@@ -32,10 +34,12 @@
 
 #sheet-title {
 	font-size: 140%;
+	overflow-wrap: break-word;
 }
 
 #sheet-composer, #sheet-arranger {
 	opacity: 80%;
+	overflow-wrap: break-word;
 }
 
 #sheet-arranger::before {

@@ -85,10 +85,12 @@
 	
 	font-size: 85%;
 	opacity: 90%;
+	height: 100%;
 }
 
 .sheet-card .info .title {
 	font-weight: bolder;
+	overflow-wrap: break-word;
 }
 
 .sheet-card .info .other-info {
@@ -99,5 +101,6 @@
 
 .sheet-card .info .composer, .sheet-card .info .arranger {
 	font-weight: bolder;
+	overflow-wrap: break-word;
 	opacity: 120%;
 }
