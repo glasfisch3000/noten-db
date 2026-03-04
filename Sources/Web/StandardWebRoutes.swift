@@ -187,7 +187,6 @@ extension StandardWebRoutes: RouteCollection {
 				decoded.arranger = nil
 			}
 			
-			print(decoded)
 			year = if let string = decoded.year {
 				if string.isEmpty {
 					nil
