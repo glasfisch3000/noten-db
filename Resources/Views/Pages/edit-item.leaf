@@ -1,0 +1,54 @@
+#extend("standard"):
+	#export("standard-head"):
+	#if(success):
+	<meta http-equiv="refresh" content="1;url=#(return)"/>
+	#endif
+	#endexport
+	
+	#export("title"):
+	Notenarchiv - Datei bearbeiten
+	#endexport
+	
+	#export("content"):
+	#if(success):
+	<div class="panel success">
+	Änderungen gespeichert
+	</div>
+	#else:
+	<div class="panel">
+		<form id="edit-form" name="edit" method="post">
+			<section>
+				<label for="title">Titel</label>
+				<input id="title" type="text" required autofocus name="title" placeholder="Titel" value="#(sheet.title)" title="Titel" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="composer">Komponist</label>
+				<input id="composer" type="text" name="composer" placeholder="Komponist" value="#(sheet.composer)" title="Komponist" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="arranger">Satz</label>
+				<input id="arranger" type="text" name="arranger" placeholder="Satz" value="#(sheet.arranger)" title="Satz" inputmode="text"/>
+			</section>
+			
+			<section>
+				<label for="year">Jahr</label>
+				<input id="year" type="number" name="year" placeholder="Jahr" value="#(sheet.year)" title="Jahr" inputmode="numeric"/>
+			</section>
+			
+			<section class="submit-section">
+				#if(error):
+				<div class="error">
+					Ein Fehler ist aufgetreten. Joa idk viel Spaß damit jetzt
+				</div>
+				#endif
+				
+				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
+				<a id="cancel" class="submit-button cancel" href="#(return)"> Abbrechen </a>
+			</section>
+		</form>
+	</div>
+	#endif
+	#endexport
+#endextend

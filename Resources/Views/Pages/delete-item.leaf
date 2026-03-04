@@ -43,7 +43,7 @@
 				#endif
 				
 				<input id="submit" class="submit-button" type="submit" value="Löschen" title="Abbrechen"/>
-				<a id="cancel" class="submit-button" href="#(return)"> Abbrechen </a>
+				<a class="submit-button cancel" href="#(return)"> Abbrechen </a>
 			</section>
 		</form>
 	</div>

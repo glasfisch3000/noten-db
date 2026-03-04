@@ -50,12 +50,7 @@ struct WebRoutes: RouteCollection {
 			let returnPath = parseReturnPath(req) ?? "/"
 			
 			do {
-				guard let buffer = try? await req.body.collect(upTo: 1_000) else {
-					throw PostError.unreadable
-				}
-				
-				let decoder = URLEncodedFormDecoder()
-				guard let credentials = try? decoder.decode(Credentials.self, from: buffer, headers: req.headers) else {
+				guard let credentials = try? await req.decodeBody(Credentials.self, as: .urlEncodedForm, maxBytes: 1_000) else {
 					throw PostError.unreadable
 				}
 				

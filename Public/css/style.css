@@ -66,6 +66,10 @@ body {
 	/* Spacing between the submit section and the rest of the form */
 	margin-top: 2em;
 }
+.panel > form .submit-section > *:not(:first-child) {
+	/* Spacing between buttons in the submit section */
+	margin-top: 0.5em;
+}
 .panel > form .error {
 	border-radius: 0.3em;
 	width: 100%;
@@ -105,17 +109,26 @@ input:not(.submit-button) {
 	display: inline-block;
 	box-sizing: border-box;
 	
-	border-color: #9a55a3;
+	border-color: #b866c3;
 	background-color: #3333;
-	color: #9a55a3;
+	color: #b866c3;
 	
 	text-align: center;
 	cursor: pointer;
 }
-
 .submit-button:hover {
 	border-color: #9a55a3;
 	background-color: #9a55a3;
+	color: inherit;
+}
+
+.submit-button.cancel {
+	border-color: #aaa;
+	color: #ccc;
+}
+.submit-button.cancel:hover {
+	border-color: #777;
+	background-color: #777;
 	color: inherit;
 }
 

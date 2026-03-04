@@ -84,6 +84,9 @@ extension StandardWebRoutes: RouteCollection {
 		routes.group(":id") {
 			$0.get("delete", use: getDeleteItem(request:))
 			$0.post("delete", use: postDeleteItem(request:))
+			
+			$0.get("edit", use: getEditItem(request:))
+			$0.on(.POST, "edit", body: .stream, use: postEditItem(request:))
 		}
 	}
 	
@@ -143,8 +146,24 @@ extension StandardWebRoutes: RouteCollection {
 			var title: String
 			var composer: String?
 			var arranger: String?
-			var year: String?
+			var year: Int?
 			var file: Data
+			
+			init(from decoder: any Decoder) throws {
+				let container = try decoder.container(keyedBy: CodingKeys.self)
+				
+				self.title = try container.decode(String.self, forKey: .title)
+				if title.isEmpty { throw RequestError.invalidFormat }
+				
+				self.composer = try container.decodeIfPresent(String.self, forKey: .composer)
+				if let composer, composer.isEmpty { self.composer = nil }
+				
+				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
+				if let arranger, arranger.isEmpty { self.arranger = nil }
+				
+				self.year = try container.decodeIfPresent(String.self, forKey: .year).flatMap(Int.init(_:))
+				self.file = try container.decode(Data.self, forKey: .file)
+			}
 		}
 		
 		struct Context: Codable {
@@ -162,69 +181,32 @@ extension StandardWebRoutes: RouteCollection {
 		// authenticate
 		let user = try requireUser(request)
 		
-		// collect data
-		let uploadData: UploadData
-		let year: Int?
 		do {
-			let buffer = if let data = request.body.data {
-				data
-			} else {
-				try await request.body.collect(upTo: 10_000_000) // max 10MB
-			}
+			// collect data
+			let uploadData = try await request.decodeBody(UploadData.self, as: .formData, maxBytes: 15_000_000) // 15MB
 			
-			let decoder = try ContentConfiguration.global.requireDecoder(for: .formData)
-			var decoded = try decoder.decode(UploadData.self, from: buffer, headers: request.headers)
-			
-			if decoded.title.isEmpty {
-				throw RequestError.invalidFormat
-			}
-			
-			if let composer = decoded.composer, composer.isEmpty {
-				decoded.composer = nil
-			}
-			
-			if let arranger = decoded.arranger, arranger.isEmpty {
-				decoded.arranger = nil
-			}
-			
-			year = if let string = decoded.year {
-				if string.isEmpty {
-					nil
-				} else if let parsed = Int(string) {
-					parsed
-				} else {
-					throw RequestError.invalidFormat
-				}
-			} else {
-				nil
-			}
-			
-			uploadData = decoded
-		} catch _ as NIOTooManyBytesError {
-			let context = Context(username: user.username, success: false, error: .tooLarge)
-			return try await request.view.render("Pages/upload", context)
-		} catch {
-			let context = Context(username: user.username, success: false, error: .unreadable)
-			return try await request.view.render("Pages/upload", context)
-		}
-		
-		// try to store data in database and file at once. if one fails, return an error page
-		do {
-			return try await request.db.transaction { db in
+			// try to store data in database and file at once. if one fails, return an error
+			try await request.db.transaction { db in
 				let sheet = Sheet(
 					title: uploadData.title,
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
-					year: year,
+					year: uploadData.year,
 					createdBy: try user.requireID()
 				)
 				try await sheet.create(on: db)
 				
 				try await storage.create(sheetID: try sheet.requireID(), contents: uploadData.file)
-				
-				let context = Context(username: user.username, success: true)
-				return try await request.view.render("Pages/upload", context)
 			}
+			
+			let context = Context(username: user.username, success: true)
+			return try await request.view.render("Pages/upload", context)
+		} catch _ as NIOTooManyBytesError {
+			let context = Context(username: user.username, success: false, error: .tooLarge)
+			return try await request.view.render("Pages/upload", context)
+		} catch _ as Abort, _ as DecodingError {
+			let context = Context(username: user.username, success: false, error: .unreadable)
+			return try await request.view.render("Pages/upload", context)
 		} catch {
 			let context = Context(username: user.username, success: false, error: .internal)
 			return try await request.view.render("Pages/upload", context)
@@ -244,28 +226,31 @@ extension StandardWebRoutes: RouteCollection {
 		let returnPath = parseReturnPath(request) ?? "/"
 		
 		let context = Context(username: user.username, sheet: try .init(sheet), return: returnPath)
-		return try await request.view.render("Pages/delete", context)
+		return try await request.view.render("Pages/delete-item", context)
 	}
 	
 	// delete a sheet and return a result page
 	func postDeleteItem(request: Request) async throws -> View {
 		struct Context: Codable {
 			var username: String
-			var sheet: SheetDTO
 			var `return`: String
 			var success: Bool
 		}
 		
 		let user = try requireUser(request)
-		let sheet = try await fetchSheet(request)
 		let returnPath = parseReturnPath(request) ?? "/"
+		
+		guard let sheetID = request.parameters.get("id", as: UUID.self) else {
+			throw Abort(.notFound)
+		}
 		
 		let success: Bool
 		
 		do {
 			try await request.db.transaction { db in
-				let sheetID = try sheet.requireID()
-				try await sheet.delete(on: db)
+				try await Sheet.query(on: db)
+					.filter(\.$id == sheetID)
+					.delete()
 				
 				try await storage.remove(sheetID: sheetID)
 			}
@@ -274,7 +259,75 @@ extension StandardWebRoutes: RouteCollection {
 			success = false
 		}
 		
-		let context = Context(username: user.username, sheet: try .init(sheet), return: returnPath, success: success)
-		return try await request.view.render("Pages/delete", context)
+		let context = Context(username: user.username, return: returnPath, success: success)
+		return try await request.view.render("Pages/delete-item", context)
+	}
+	
+	func getEditItem(request: Request) async throws -> View {
+		struct Context: Codable {
+			var username: String
+			var sheet: SheetDTO
+			var `return`: String
+		}
+		
+		let user = try requireUser(request)
+		let sheet = try await fetchSheet(request)
+		let returnPath = parseReturnPath(request) ?? "/"
+		
+		let context = Context(username: user.username, sheet: try .init(sheet), return: returnPath)
+		return try await request.view.render("Pages/edit-item", context)
+	}
+	
+	// delete a sheet and return a result page
+	func postEditItem(request: Request) async throws -> View {
+		struct Context: Codable {
+			var username: String
+			var sheet: SheetDTO
+			var `return`: String
+			var success: Bool
+		}
+		
+		struct EditData: Codable {
+			var title: String
+			var composer: String?
+			var arranger: String?
+			var year: Int?
+			
+			init(from decoder: any Decoder) throws {
+				let container = try decoder.container(keyedBy: CodingKeys.self)
+				
+				self.title = try container.decode(String.self, forKey: .title)
+				if title.isEmpty { throw RequestError.invalidFormat }
+				
+				self.composer = try container.decodeIfPresent(String.self, forKey: .composer)
+				if let composer, composer.isEmpty { self.composer = nil }
+				
+				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
+				if let arranger, arranger.isEmpty { self.arranger = nil }
+				
+				self.year = try container.decodeIfPresent(String.self, forKey: .year).flatMap(Int.init(_:))
+			}
+		}
+		
+		let user = try requireUser(request)
+		let sheet = try await fetchSheet(request)
+		let returnPath = parseReturnPath(request) ?? "/"
+		
+		do {
+			// collect data
+			let edit: EditData = try await request.decodeBody(as: .urlEncodedForm, maxBytes: 10_000) // 10KB should be enough
+			
+			sheet.title = edit.title
+			sheet.composer = edit.composer
+			sheet.arranger = edit.arranger
+			sheet.year = edit.year
+			try await sheet.update(on: request.db)
+			
+			let context = Context(username: user.username, sheet: try .init(sheet), return: returnPath, success: true)
+			return try await request.view.render("Pages/edit-item", context)
+		} catch {
+			let context = Context(username: user.username, sheet: try .init(sheet), return: returnPath, success: false)
+			return try await request.view.render("Pages/edit-item", context)
+		}
 	}
 }

@@ -47,10 +47,6 @@
 	font-weight: normal;
 }
 
-#buttons > *:not(:first-child) {
-	margin-top: 0.5em;
-}
-
 /* make the delete button red */
 #submit {
 	border-color: #e22;
