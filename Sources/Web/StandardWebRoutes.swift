@@ -90,7 +90,7 @@ extension StandardWebRoutes: RouteCollection {
 			var page: PageAttributes
 		}
 		
-		let context = Context(page: try PageAttributes(request, requireUser: true))
+		let context = Context(page: try PageAttributes(request, requireUser: true, requireReturn: true))
 		return try await request.view.render("Pages/upload", context)
 	}
 	
