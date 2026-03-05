@@ -1,0 +1,34 @@
+import struct Foundation.UUID
+
+struct SheetDTO: Codable {
+	struct Creator: Codable {
+		var username: String
+	}
+	
+	var id: UUID
+	var title: String
+	var composer: String?
+	var arranger: String?
+	var year: Int?
+	var creator: Creator?
+	
+	init(id: UUID, title: String, composer: String?, arranger: String?, year: Int?, creator: Creator?) {
+		self.id = id
+		self.title = title
+		self.composer = composer
+		self.arranger = arranger
+		self.year = year
+		self.creator = creator
+	}
+	
+	init(_ sheet: Sheet) throws {
+		self.id = try sheet.requireID()
+		self.title = sheet.title
+		self.composer = sheet.composer
+		self.arranger = sheet.arranger
+		self.year = sheet.year
+		self.creator = sheet.$createdBy.value.flatMap {
+			Self.Creator(username: $0.username)
+		}
+	}
+}

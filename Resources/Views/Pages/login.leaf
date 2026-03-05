@@ -1,7 +1,7 @@
 #extend("master"):
 	#export("head"):
 	#if(success):
-	<meta http-equiv="refresh" content="1;url=#(return)"/>
+	<meta http-equiv="refresh" content="1;url=#(page.return)"/>
 	#endif
 	#endexport
 	
