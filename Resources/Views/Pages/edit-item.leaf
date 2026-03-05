@@ -1,7 +1,7 @@
 #extend("standard"):
 	#export("standard-head"):
 	#if(success):
-	<meta http-equiv="refresh" content="1;url=#(page.return)"/>
+	<meta http-equiv="refresh" content="1;url=#attribute("return")"/>
 	#endif
 	#endexport
 	
@@ -45,7 +45,7 @@
 				#endif
 				
 				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
-				<a id="cancel" class="submit-button cancel" href="#(page.return)"> Abbrechen </a>
+				<a id="cancel" class="submit-button cancel" href="#attribute("return")"> Abbrechen </a>
 			</section>
 		</form>
 	</div>

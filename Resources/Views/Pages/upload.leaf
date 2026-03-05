@@ -58,7 +58,7 @@
 				#endif
 				
 				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
-				<a class="submit-button cancel" href="#(page.return)"> Abbrechen </a>
+				<a class="submit-button cancel" href="#attribute("return")"> Abbrechen </a>
 			</section>
 		</form>
 	</div>

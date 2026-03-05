@@ -7,6 +7,7 @@ struct WebRoutes: RouteCollection {
 	
 	func boot(routes: any RoutesBuilder) throws {
 		routes
+			.grouped(ErrorMiddleware())
 			.grouped(SessionAuthenticator())
 			.group("login", configure: configureLogin(routes:))
 		
@@ -19,12 +20,6 @@ struct WebRoutes: RouteCollection {
 	}
 	
 	func configureLogin(routes: RoutesBuilder) {
-		struct Context: Encodable {
-			var page: PageAttributes
-			var success: Bool = false
-			var error: PostError? = nil
-		}
-		
 		enum PostError: String, Error, Codable {
 			case unreadable
 			case `internal`
@@ -36,19 +31,11 @@ struct WebRoutes: RouteCollection {
 			var password: String
 		}
 		
-		@Sendable
-		func parseReturnPath(_ request: Request) -> String? {
-			try? request.query.get(String.self, at: "return")
-		}
-		
 		routes.get { req -> View in
-			let page = try PageAttributes(req, requireReturn: true)
-			return try await req.view.render("Pages/login", Context(page: page))
+			return try await req.view.render("Pages/login")
 		}
 		
 		routes.post { req -> View in
-			let page = try PageAttributes(req, requireReturn: true)
-			
 			do {
 				guard let credentials = try? await req.decodeBody(Credentials.self, as: .urlEncodedForm, maxBytes: 1_000) else {
 					throw PostError.unreadable
@@ -67,11 +54,11 @@ struct WebRoutes: RouteCollection {
 				
 				req.session.authenticate(user)
 				
-				return try await req.view.render("Pages/login", Context(page: page, success: true))
+				return try await req.view.render("Pages/login", ["success": true])
 			} catch let error as PostError {
-				return try await req.view.render("Pages/login", Context(page: page, error: error))
+				return try await req.view.render("Pages/login", ["error": error])
 			} catch {
-				return try await req.view.render("Pages/login", Context(page: page, error: .internal))
+				return try await req.view.render("Pages/login", ["error": PostError.internal])
 			}
 		}
 	}

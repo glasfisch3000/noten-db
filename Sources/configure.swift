@@ -64,6 +64,7 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 		
 		// add leaf rendering
 		app.views.use(.leaf)
+		app.leaf.tags["attribute"] = AttributeTag()
 		
 		// serve files from the Public directory
 		let fileMiddleware = FileMiddleware(publicDirectory: app.directory.publicDirectory, advancedETagComparison: true, cachePolicy: .noCache)
@@ -86,7 +87,6 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 		app.sessions.use(.memory)
 		
 		try app.routes
-			.grouped(app.sessions.middleware)
 			.register(collection: WebRoutes(storage: storage))
 		
 		return (app, storage)

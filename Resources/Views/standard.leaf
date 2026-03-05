@@ -8,12 +8,12 @@
 	<header>
 		<a id="title" class="header-item" href="/">Notenarchiv</a>
 		
-		<a id="new-sheet-button" class="header-item" href="/upload?return=#(page.path)">
+		<a id="new-sheet-button" class="header-item" href="/upload?return=#attribute("path", "queryEncoding")">
 			<img src="/svg/plus.svg"/>
 		</a>
 		
 		<div id="login" class="header-item">
-			<div id="username">#(page.username)</div>
+			<div id="username">#(username)</div>
 			<img id="user-icon" src="/svg/person.circle.svg"/>
 		</div>
 	</header>

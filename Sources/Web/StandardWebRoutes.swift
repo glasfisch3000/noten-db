@@ -47,7 +47,7 @@ extension StandardWebRoutes: RouteCollection {
 	
 	func index(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var page: PageAttributes
+			var username: String
 			var sheets: [SheetDTO]
 			
 			var pageNumber: UInt
@@ -61,7 +61,7 @@ extension StandardWebRoutes: RouteCollection {
 			var size: UInt?
 		}
 		
-		let page = try PageAttributes(request, requireUser: true)
+		let user = try request.auth.require(User.self)
 		
 		let query = try request.query.decode(Query.self)
 		if let size = query.size, size < 1 {
@@ -74,7 +74,7 @@ extension StandardWebRoutes: RouteCollection {
 			.page(withIndex: Int(query.page ?? 0), size: Int(query.size ?? 30))
 		
 		let context = Context(
-			page: page,
+			username: user.username,
 			sheets: try sheets.items.map(SheetDTO.init(_:)),
 			pageNumber: UInt(sheets.metadata.page),
 			pageCount: UInt(sheets.metadata.pageCount),
@@ -86,12 +86,8 @@ extension StandardWebRoutes: RouteCollection {
 	}
 	
 	func upload(request: Request) async throws -> View {
-		struct Context: Encodable {
-			var page: PageAttributes
-		}
-		
-		let context = Context(page: try PageAttributes(request, requireUser: true, requireReturn: true))
-		return try await request.view.render("Pages/upload", context)
+		let user = try request.auth.require(User.self)
+		return try await request.view.render("Pages/upload", ["username": user.username])
 	}
 	
 	func postUpload(request: Request) async throws -> View {
@@ -126,13 +122,13 @@ extension StandardWebRoutes: RouteCollection {
 				case `internal`
 			}
 			
-			var page: PageAttributes
+			var username: String
 			
 			var success: Bool
 			var error: PostError? = nil
 		}
 		
-		let page = try PageAttributes(request, requireUser: true, requireReturn: true)
+		let user = try request.auth.require(User.self)
 		
 		do {
 			// collect data
@@ -145,23 +141,23 @@ extension StandardWebRoutes: RouteCollection {
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
 					year: uploadData.year,
-					createdBy: try page.user!.requireID()
+					createdBy: try user.requireID()
 				)
 				try await sheet.create(on: db)
 				
 				try await storage.create(sheetID: try sheet.requireID(), contents: uploadData.file)
 			}
 			
-			let context = Context(page: page, success: true)
+			let context = Context(username: user.username, success: true)
 			return try await request.view.render("Pages/upload", context)
 		} catch _ as NIOTooManyBytesError {
-			let context = Context(page: page, success: false, error: .tooLarge)
+			let context = Context(username: user.username, success: false, error: .tooLarge)
 			return try await request.view.render("Pages/upload", context)
 		} catch _ as Abort, _ as DecodingError {
-			let context = Context(page: page, success: false, error: .unreadable)
+			let context = Context(username: user.username, success: false, error: .unreadable)
 			return try await request.view.render("Pages/upload", context)
 		} catch {
-			let context = Context(page: page, success: false, error: .internal)
+			let context = Context(username: user.username, success: false, error: .internal)
 			return try await request.view.render("Pages/upload", context)
 		}
 	}
@@ -169,25 +165,25 @@ extension StandardWebRoutes: RouteCollection {
 	// get the confirmation page for deleting a sheet
 	func getDeleteItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var page: PageAttributes
+			var username: String
 			var sheet: SheetDTO
 		}
 		
-		let page = try PageAttributes(request, requireUser: true, requireReturn: true)
+		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
-		let context = Context(page: page, sheet: try .init(sheet))
+		let context = Context(username: user.username, sheet: try .init(sheet))
 		return try await request.view.render("Pages/delete-item", context)
 	}
 	
 	// delete a sheet and return a result page
 	func postDeleteItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var page: PageAttributes
+			var username: String
 			var success: Bool
 		}
 		
-		let page = try PageAttributes(request, requireUser: true, requireReturn: true)
+		let user = try request.auth.require(User.self)
 		
 		guard let sheetID = request.parameters.get("id", as: UUID.self) else {
 			throw Abort(.notFound)
@@ -208,27 +204,27 @@ extension StandardWebRoutes: RouteCollection {
 			success = false
 		}
 		
-		let context = Context(page: page, success: success)
+		let context = Context(username: user.username, success: success)
 		return try await request.view.render("Pages/delete-item", context)
 	}
 	
 	func getEditItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var page: PageAttributes
+			var username: String
 			var sheet: SheetDTO
 		}
 		
-		let page = try PageAttributes(request, requireUser: true, requireReturn: true)
+		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
-		let context = Context(page: page, sheet: try .init(sheet))
+		let context = Context(username: user.username, sheet: try .init(sheet))
 		return try await request.view.render("Pages/edit-item", context)
 	}
 	
 	// delete a sheet and return a result page
 	func postEditItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var page: PageAttributes
+			var username: String
 			var sheet: SheetDTO
 			var success: Bool
 		}
@@ -255,7 +251,7 @@ extension StandardWebRoutes: RouteCollection {
 			}
 		}
 		
-		let page = try PageAttributes(request, requireUser: true, requireReturn: true)
+		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
 		do {
@@ -268,10 +264,10 @@ extension StandardWebRoutes: RouteCollection {
 			sheet.year = edit.year
 			try await sheet.update(on: request.db)
 			
-			let context = Context(page: page, sheet: try .init(sheet), success: true)
+			let context = Context(username: user.username, sheet: try .init(sheet), success: true)
 			return try await request.view.render("Pages/edit-item", context)
 		} catch {
-			let context = Context(page: page, sheet: try .init(sheet), success: false)
+			let context = Context(username: user.username, sheet: try .init(sheet), success: false)
 			return try await request.view.render("Pages/edit-item", context)
 		}
 	}
