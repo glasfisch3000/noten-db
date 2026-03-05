@@ -8,14 +8,15 @@
 	<header>
 		<a id="title" class="header-item" href="/">Notenarchiv</a>
 		
-		<a id="new-sheet-button" class="header-item" href="/upload?return=#attribute("path", "queryEncoding")">
-			<img src="/svg/plus.svg"/>
+		<a id="new-sheet-button" class="header-item symbol" href="/upload?return=#attribute("path", "queryEncoding")">
+			􀅼
 		</a>
 		
-		<div id="login" class="header-item">
-			<div id="username">#(username)</div>
-			<img id="user-icon" src="/svg/person.circle.svg"/>
-		</div>
+		<label id="login" class="header-item toggle symbol">
+			<input type="checkbox">
+			<span class="unchecked"> 􀓣 </span>
+			<span class="checked"> 􀓤 </span>
+		</label>
 	</header>
 	
 	<div id="viewport">

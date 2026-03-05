@@ -139,3 +139,16 @@ input:not(.submit-button) {
 .symbol {
 	font-family: SFPro;
 }
+
+label.toggle > input {
+	/* hide the input toggle */
+	display: none;
+}
+label.toggle:has(> input:checked) > .unchecked {
+	/* hide the unchecked part if the toggle is checked */
+	display: none;
+}
+label.toggle:has(> input:not(:checked)) > .checked {
+	/* hide the checked part if the toggle is unchecked */
+	display: none;
+}

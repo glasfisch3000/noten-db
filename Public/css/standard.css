@@ -50,11 +50,11 @@ header {
 	padding-bottom: 0.2em;
 	
 	font-size: 140%;
-	font-weight: bolder;
 	
 	display: flex;
 	align-items: center;
 	
+	background-color: #0003;
 	-webkit-backdrop-filter: blur(5px);
 	backdrop-filter: blur(5px);
 }
@@ -68,96 +68,36 @@ header > .header-item {
 	padding-right: 0.8em;
 	
 	vertical-align: middle;
-}
-
-header > .header-item:hover {
-	background: #4444;
-}
-
-header > button, header > a {
+	
 	color: inherit;
-	background: inherit;
+	background: none;
 	border: none;
 	font-size: inherit;
+	font-weight: bolder;
 	text-decoration: none;
 }
+header > .header-item:hover {
+	background: #6665;
+}
 
-header #title {
-	color: #ccc;
+header > .header-item.symbol {
+	width: 1.3em;
+	height: 1.3em;
+	text-align: center;
+	align-content: center;
+	
+	font-size: 125%;
+	font-weight: inherit;
+	
+	padding: 0.056em; /* experimentally determined */
 }
 
 header #new-sheet-button {
 	margin-left: auto;
 	margin-right: 0em;
-	
-	/* Make the border a circle */
-	padding: 0.3em;
-}
-
-header #new-sheet-button > img {
-	margin-bottom: -0.25em;
-	margin-left: 0.03em;
-	margin-right: 0.03em;
-	
-	width: 1.15em;
-	height: 1.15em;
-	
-	color: #eee;
-	
-	display: inline;
 }
 
 header #login {
 	margin-left: 0.5em;
-	margin-right: 0em;
-	
-	/* Make the border look concentric with the icon */
-	padding-right: 0.3em;
-}
-
-header #login > * {
-	display: inline;
-}
-
-header #login #username {
-	margin-top: -0.15em;
-	margin-bottom: -0.3em;
-	
-	box-sizing: border-box;
-	width: 0;
-	
-	background: linear-gradient(to left, #0000, #eee 0.5em);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-	
-	opacity: 0%;
-	
-	transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
-	
-	display: inline-block;
-	display: inline flow-root;
-	
-	overflow: hidden;
-	white-space: nowrap;
-}
-
-/* Only show the username on hover */
-header #login:hover #username {
-	opacity: 100%;
-	
-	/* Pfusch */
-	width: 5.1964285714em;
-	width: calc-size(auto, size);
-}
-
-header #login > #user-icon {
-	margin-top: -0.1em;
-	margin-bottom: -0.35em;
-	margin-left: -1.05em;
-	
-	width: 1.3em;
-	height: 1.3em;
-	
-	color: #eee;
+	margin-right: 0.1em;
 }
