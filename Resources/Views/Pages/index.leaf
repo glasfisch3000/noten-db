@@ -8,40 +8,42 @@
 	#endexport
 	
 	#export("content"):
-	#for(sheet in sheets):
-	<div class="sheet-card">
-		<div class="buttons">
-			<a class="symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
-			<a class="symbol" href="/file/#(sheet.id)" download="#(sheet.title).pdf"> 􀅀 </a>
-			<a class="trash symbol" href="/#(sheet.id)/delete?return=/"> 􀈑 </a>
+	<div id="content">
+		#for(sheet in sheets):
+		<div class="sheet-card">
+			<div class="buttons">
+				<a class="symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
+				<a class="symbol" href="/file/#(sheet.id)" download="#(sheet.title).pdf"> 􀅀 </a>
+				<a class="trash symbol" href="/#(sheet.id)/delete?return=/"> 􀈑 </a>
+			</div>
+			<a href="/file/#(sheet.id)">
+				<div class="content">
+					<img src="/file/#(sheet.id)" load="lazy" decoding="async"/>
+				</div>
+				<div class="info">
+					<div class="title">
+						#(sheet.title)
+					</div>
+					
+					#if(sheet.composer || sheet.arranger || sheet.year):
+					<div class="other-info">
+						#if(sheet.composer):
+						<span class="composer">#(sheet.composer)</span>
+						#endif
+						
+						#if(sheet.composer && sheet.arranger):
+						<br>
+						#endif
+						
+						#if(sheet.arranger):
+						Satz: <span class="arranger">#(sheet.arranger)</span>
+						#endif
+					</div>
+					#endif
+				</div>
+			</a>
 		</div>
-		<a href="/file/#(sheet.id)">
-			<div class="content">
-				<img src="/file/#(sheet.id)" load="lazy" decoding="async"/>
-			</div>
-			<div class="info">
-				<div class="title">
-					#(sheet.title)
-				</div>
-				
-				#if(sheet.composer || sheet.arranger || sheet.year):
-				<div class="other-info">
-					#if(sheet.composer):
-					<span class="composer">#(sheet.composer)</span>
-					#endif
-					
-					#if(sheet.composer && sheet.arranger):
-					<br>
-					#endif
-					
-					#if(sheet.arranger):
-					Satz: <span class="arranger">#(sheet.arranger)</span>
-					#endif
-				</div>
-				#endif
-			</div>
-		</a>
+		#endfor
 	</div>
-	#endfor
 	#endexport
 #endextend
