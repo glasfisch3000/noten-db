@@ -43,6 +43,9 @@ extension StandardWebRoutes: RouteCollection {
 			$0.get("edit", use: getEditItem(request:))
 			$0.on(.POST, "edit", body: .stream, use: postEditItem(request:))
 		}
+		
+		routes.get("change-password", use: getChangePassword(request:))
+		routes.post("change-password", use: postChangePassword(request:))
 	}
 	
 	func index(request: Request) async throws -> View {
@@ -269,6 +272,73 @@ extension StandardWebRoutes: RouteCollection {
 		} catch {
 			let context = Context(username: user.username, sheet: try .init(sheet), success: false)
 			return try await request.view.render("Pages/edit-item", context)
+		}
+	}
+	
+	func getChangePassword(request: Request) async throws -> View {
+		let user = try request.auth.require(User.self)
+		return try await request.view.render("Pages/change-password", ["username": user.username])
+	}
+	
+	func postChangePassword(request: Request) async throws -> View {
+		enum PostError: String, Codable {
+			case unreadable
+			case `internal`
+			case wrong
+			case invalid
+			case noMatch
+		}
+		
+		struct Context: Encodable {
+			var username: String
+			var success: Bool
+			var error: PostError? = nil
+		}
+		
+		struct Query: Codable {
+			enum CodingKeys: String, CodingKey {
+				case currentPassword = "current-password"
+				case newPassword = "new-password"
+				case newPasswordRepeat = "new-password-repeat"
+			}
+			
+			var currentPassword: String
+			var newPassword: String
+			var newPasswordRepeat: String
+		}
+		
+		let user = try request.auth.require(User.self)
+		
+		do {
+			// collect data
+			let queryData = try await request.decodeBody(Query.self, as: .urlEncodedForm, maxBytes: 2_000) // 2MB
+			
+			guard user.verify(password: queryData.currentPassword) else {
+				let context = Context(username: user.username, success: false, error: .wrong)
+				return try await request.view.render("Pages/change-password", context)
+			}
+			
+			guard queryData.newPassword == queryData.newPasswordRepeat else {
+				let context = Context(username: user.username, success: false, error: .noMatch)
+				return try await request.view.render("Pages/change-password", context)
+			}
+			
+			if queryData.newPassword.isEmpty {
+				let context = Context(username: user.username, success: false, error: .invalid)
+				return try await request.view.render("Pages/change-password", context)
+			}
+			
+			user.password = User.hashPassword(queryData.newPassword, salt: user.salt)
+			try await user.update(on: request.db)
+			
+			let context = Context(username: user.username, success: true)
+			return try await request.view.render("Pages/change-password", context)
+		} catch _ as NIOTooManyBytesError, _ as Abort, _ as DecodingError {
+			let context = Context(username: user.username, success: false, error: .unreadable)
+			return try await request.view.render("Pages/change-password", context)
+		} catch {
+			let context = Context(username: user.username, success: false, error: .internal)
+			return try await request.view.render("Pages/change-password", context)
 		}
 	}
 }

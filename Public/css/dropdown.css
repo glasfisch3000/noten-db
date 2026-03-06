@@ -24,7 +24,7 @@
 
 .dropdown-item {
 	display: block;
-	padding-left: 1.85em;
+	padding-left: 1.94em;
 	padding-right: 0.5em;
 	padding-top: 0.2em;
 	padding-bottom: 0.2em;
@@ -46,7 +46,7 @@
 
 .dropdown-button {
 	border-radius: 1em;
-	padding-left: 0.4em;
+	padding-left: 0.45em;
 	padding-right: 0.5em;
 	padding-top: 0.2em;
 	padding-bottom: 0.2em;
@@ -70,10 +70,13 @@
 
 .dropdown-button > .symbol {
 	margin: 0em;
-	margin-right: 0.45em;
+	margin-right: 0.5em;
 	box-sizing: border-box;
 	
 	width: 1.3em;
 	height: 1.3em;
 	font-size: 83%;
+	
+	align-items: safe center;
+	text-align: center;
 }
