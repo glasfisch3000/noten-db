@@ -1,0 +1,80 @@
+.dropdown {
+	position: absolute;
+	top: 3.3em;
+	left: auto;
+	bottom: auto;
+	
+	z-index: 9;
+	
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	border: 1px solid #8888;
+	border-radius: 1em;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+	padding-top: 0.25em;
+	padding-bottom: 0.25em;
+	
+	font-size: 125%;
+	
+	background-color: #0007;
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+}
+
+#login-dropdown {
+	right: 0.8em;
+}
+header:has(> #login > input:not(:checked)) ~ #login-dropdown {
+	display: none;
+}
+
+.dropdown > .dropdown-item {
+	display: block;
+	padding-left: 1.85em;
+	padding-right: 0.5em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	
+	color: #ccc;
+}
+.dropdown > :not(:first-child) {
+	margin-top: 0.25em;
+}
+.dropdown > hr {
+	margin: 0;
+	margin-left: 1.66em;
+	margin-right: 0.5em;
+	border: none;
+	border-bottom: 1px solid;
+	color: #8888;
+}
+
+.dropdown > .dropdown-button {
+	border-radius: 1em;
+	padding-left: 0.4em;
+	padding-right: 0.5em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	
+	display: flex;
+	align-items: first baseline;
+	box-sizing: border-box;
+	
+	color: inherit;
+	text-decoration: inherit;
+}
+.dropdown > .dropdown-button:hover {
+	background: #fff2;
+	color: #fff;
+}
+
+.dropdown > .dropdown-button > .symbol {
+	margin: 0em;
+	margin-right: 0.45em;
+	box-sizing: border-box;
+	
+	width: 1.3em;
+	height: 1.3em;
+	font-size: 83%;
+}

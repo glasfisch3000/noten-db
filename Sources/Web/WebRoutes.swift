@@ -8,8 +8,11 @@ struct WebRoutes: RouteCollection {
 	func boot(routes: any RoutesBuilder) throws {
 		routes
 			.grouped(ErrorMiddleware())
-			.grouped(SessionAuthenticator())
-			.group("login", configure: configureLogin(routes:))
+			.group(SessionAuthenticator()) {
+				$0.get("login", use: getLogin(request:))
+				$0.post("login", use: postLogin(request:))
+				$0.get("logout", use: getLogout(request:))
+			}
 		
 		try routes
 			.grouped(ErrorMiddleware())
@@ -19,7 +22,11 @@ struct WebRoutes: RouteCollection {
 			}
 	}
 	
-	func configureLogin(routes: RoutesBuilder) {
+	func getLogin(request: Request) async throws -> View {
+		try await request.view.render("Pages/login")
+	}
+	
+	func postLogin(request: Request) async throws -> View {
 		enum PostError: String, Error, Codable {
 			case unreadable
 			case `internal`
@@ -31,36 +38,36 @@ struct WebRoutes: RouteCollection {
 			var password: String
 		}
 		
-		routes.get { req -> View in
-			return try await req.view.render("Pages/login")
-		}
-		
-		routes.post { req -> View in
-			do {
-				guard let credentials = try? await req.decodeBody(Credentials.self, as: .urlEncodedForm, maxBytes: 1_000) else {
-					throw PostError.unreadable
-				}
-				
-				guard let user = try await User
-					.query(on: req.db)
-					.filter(\.$username == credentials.username)
-					.first() else {
-					throw PostError.wrong
-				}
-				
-				guard user.verify(password: credentials.password) else {
-					throw PostError.wrong
-				}
-				
-				req.session.authenticate(user)
-				
-				return try await req.view.render("Pages/login", ["success": true])
-			} catch let error as PostError {
-				return try await req.view.render("Pages/login", ["error": error])
-			} catch {
-				return try await req.view.render("Pages/login", ["error": PostError.internal])
+		do {
+			guard let credentials = try? await request.decodeBody(Credentials.self, as: .urlEncodedForm, maxBytes: 1_000) else {
+				throw PostError.unreadable
 			}
+			
+			guard let user = try await User
+				.query(on: request.db)
+				.filter(\.$username == credentials.username)
+				.first() else {
+				throw PostError.wrong
+			}
+			
+			guard user.verify(password: credentials.password) else {
+				throw PostError.wrong
+			}
+			
+			request.session.authenticate(user)
+			
+			return try await request.view.render("Pages/login", ["success": true])
+		} catch let error as PostError {
+			return try await request.view.render("Pages/login", ["error": error])
+		} catch {
+			return try await request.view.render("Pages/login", ["error": PostError.internal])
 		}
+	}
+	
+	func getLogout(request: Request) async throws -> View {
+		request.session.destroy()
+		request.auth.logout(User.self)
+		return try await request.view.render("Pages/logout")
 	}
 	
 	func getFile(request: Request) async throws -> Response {

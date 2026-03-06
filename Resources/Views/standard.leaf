@@ -1,11 +1,14 @@
 #extend("master"):
 	#export("head"):
 	<link rel="stylesheet" href="/css/standard.css">
+	<link rel="stylesheet" href="/css/dropdown.css">
 	#import("standard-head")
 	#endexport
 	
 	#export("body"):
 	<header>
+		<div id="backdrop"> </div>
+		
 		<a id="title" class="header-item" href="/">Notenarchiv</a>
 		
 		<a id="new-sheet-button" class="header-item symbol" href="/upload?return=#attribute("path", "queryEncoding")">
@@ -16,8 +19,20 @@
 			<input type="checkbox">
 			<span class="unchecked"> 􀓣 </span>
 			<span class="checked"> 􀓤 </span>
+			<div> </div>
 		</label>
 	</header>
+	
+	<div id="login-dropdown" class="dropdown">
+		<div class="dropdown-item"> #(username) </div>
+		
+		<hr/>
+		
+		<a class="dropdown-button" href="/logout">
+			<span class="symbol"> 􁚠 </span>
+			Abmelden
+		</a>
+	</div>
 	
 	<div id="viewport">
 		<div id="content">

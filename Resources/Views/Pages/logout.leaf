@@ -1,0 +1,15 @@
+#extend("master"):
+	#export("head"):
+	<meta http-equiv="refresh" content="1;url=/login"/>
+	#endexport
+	
+	#export("title"):
+	Abgemeldet
+	#endexport
+	
+	#export("body"):
+	<div class="panel success">
+		Benutzer abgemeldet
+	</div>
+	#endexport
+#endextend
