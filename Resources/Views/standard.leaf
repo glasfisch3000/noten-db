@@ -28,7 +28,7 @@
 		
 		<hr/>
 		
-		<a class="dropdown-button" href="/logout">
+		<a class="dropdown-button destructive" href="/logout">
 			<span class="symbol"> 􁚠 </span>
 			Abmelden
 		</a>

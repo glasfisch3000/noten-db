@@ -22,14 +22,7 @@
 	backdrop-filter: blur(5px);
 }
 
-#login-dropdown {
-	right: 0.8em;
-}
-header:has(> #login > input:not(:checked)) ~ #login-dropdown {
-	display: none;
-}
-
-.dropdown > .dropdown-item {
+.dropdown-item {
 	display: block;
 	padding-left: 1.85em;
 	padding-right: 0.5em;
@@ -38,6 +31,7 @@ header:has(> #login > input:not(:checked)) ~ #login-dropdown {
 	
 	color: #ccc;
 }
+
 .dropdown > :not(:first-child) {
 	margin-top: 0.25em;
 }
@@ -50,7 +44,7 @@ header:has(> #login > input:not(:checked)) ~ #login-dropdown {
 	color: #8888;
 }
 
-.dropdown > .dropdown-button {
+.dropdown-button {
 	border-radius: 1em;
 	padding-left: 0.4em;
 	padding-right: 0.5em;
@@ -64,12 +58,17 @@ header:has(> #login > input:not(:checked)) ~ #login-dropdown {
 	color: inherit;
 	text-decoration: inherit;
 }
-.dropdown > .dropdown-button:hover {
+.dropdown-button:hover {
 	background: #fff2;
 	color: #fff;
 }
 
-.dropdown > .dropdown-button > .symbol {
+.dropdown-button.destructive:hover {
+	background: #ff2a2a60;
+	color: #eee;
+}
+
+.dropdown-button > .symbol {
 	margin: 0em;
 	margin-right: 0.45em;
 	box-sizing: border-box;

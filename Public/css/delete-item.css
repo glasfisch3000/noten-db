@@ -46,14 +46,3 @@
 	content: "Satz:";
 	font-weight: normal;
 }
-
-/* make the delete button red */
-#submit {
-	border-color: #e22;
-	color: #e22;
-}
-#submit:hover {
-	border-color: #c22;
-	background-color: #c22;
-	color: #eee;
-}

@@ -12,12 +12,12 @@
 	position: relative;
 }
 
-.sheet-card a {
+.sheet-card > a {
 	text-decoration: none;
 	color: inherit;
 }
 
-.sheet-card .buttons {
+.sheet-card > .buttons {
 	position: absolute;
 	padding-top: 0.5em;
 	padding-bottom: 0.5em;
@@ -33,7 +33,7 @@
 	width: 100%;
 }
 
-.sheet-card .buttons > * {
+.sheet-card-button {
 	padding: 0.2em;
 	border-radius: 0.3em;
 	background: #222;
@@ -45,17 +45,20 @@
 	align-content: center;
 	
 	cursor: pointer;
+	text-decoration: none;
 }
-
-.sheet-card .buttons > a:hover, .sheet-card .buttons button:hover {
+.sheet-card-button:hover {
 	color: inherit;
 }
-
-.sheet-card .buttons > a:active, .sheet-card .buttons button:active {
+.sheet-card-button:active {
+	color: inherit;
 	background: #555;
 }
 
-.sheet-card .buttons > .trash:hover {
+.sheet-card-button.destructive:hover {
+	color: #f44;
+}
+.sheet-card-button.destructive:hover {
 	color: #f44;
 }
 

@@ -126,3 +126,9 @@ header > .header-item.symbol {
 	width: 100%;
 	height: 100%;
 }
+#login-dropdown {
+	right: 0.8em;
+}
+header:has(> #login > input:not(:checked)) ~ #login-dropdown {
+	display: none;
+}

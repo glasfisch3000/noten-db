@@ -122,6 +122,16 @@ input:not(.submit-button) {
 	color: inherit;
 }
 
+.submit-button.destructive {
+	border-color: #e22;
+	color: #e22;
+}
+.submit-button.destructive:hover {
+	border-color: #c22;
+	background-color: #c22;
+	color: #eee;
+}
+
 .submit-button.cancel {
 	border-color: #aaa;
 	color: #ccc;
