@@ -21,7 +21,7 @@ body {
 	/* center the panel on the page */
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: safe center;
 	height: 100%;
 }
 
