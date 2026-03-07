@@ -1,0 +1,79 @@
+*:has(> .panel) {
+	/* center the panel on the page */
+	justify-content: center;
+	align-items: safe center;
+	align-content: safe center;
+	height: 100%;
+}
+
+.panel {
+	margin: 1em auto;
+	
+	border: 1px solid #8888;
+	border-radius: 1em;
+	padding: 1em;
+	
+	min-width: 20em;
+	max-width: 40em;
+	width: 60%;
+	box-sizing: border-box;
+}
+
+.panel > form section:not(:first-child):not(.submit-section) {
+	margin-top: 2em;
+}
+.panel > form section:not(:last-child) {
+	margin-bottom: 2em;
+}
+
+.panel > form label {
+	/* make labels smaller */
+	font-size: 90%;
+	padding: 0.2em;
+	
+	/* try hiding them for now */
+	display: none;
+}
+/*.panel > form label + input {*/
+/*	/* Spacing between inputs and their labels * /*/
+/*	margin-top: 0.2em;*/
+/*}*/
+
+.panel > form input {
+	width: 100%;
+	box-sizing: border-box;
+}
+.panel > form input:not(.submit-button):not(:last-child) {
+	margin-bottom: 1em;
+}
+
+.panel > form:has(input:required:invalid) input[type=submit] {
+	/* Make the submit button look disabled if the form's input is invalid */
+	border-color: #80808080;
+	background-color: #3333;
+	color: #aaa;
+}
+
+.panel > form .submit-section {
+	/* Spacing between the submit section and the rest of the form */
+	margin-top: 2em;
+}
+.panel > form .submit-section > *:not(:first-child) {
+	/* Spacing between buttons in the submit section */
+	margin-top: 0.5em;
+}
+
+.panel > form .error {
+	border-radius: 0.3em;
+	width: 100%;
+	box-sizing: border-box;
+	
+	padding-left: 0.6em;
+	padding-right: 0.6em;
+	padding-top: 0.35em;
+	padding-bottom: 0.35em;
+	
+	font-size: 70%;
+	text-align: center;
+	background: #e226;
+}

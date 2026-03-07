@@ -20,9 +20,7 @@
 			<section>
 				<label for="username">Benutzer</label>
 				<input id="username" type="text" required autofocus name="username" placeholder="Benutzername" title="Benutzername" autocomplete="username" inputmode="text"/>
-			</section>
-			
-			<section>
+				
 				<label for="password">Passwort</label>
 				<input id="password" type="password" required name="password" placeholder="Passwort" title="Passwort" autocomplete="password" inputmode="text"/>
 			</section>
