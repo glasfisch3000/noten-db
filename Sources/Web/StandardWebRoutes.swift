@@ -311,7 +311,7 @@ extension StandardWebRoutes: RouteCollection {
 		
 		do {
 			// collect data
-			let queryData = try await request.decodeBody(Query.self, as: .urlEncodedForm, maxBytes: 2_000) // 2MB
+			let queryData = try await request.decodeBody(Query.self, as: .urlEncodedForm, maxBytes: 2_000) // 2KB
 			
 			guard user.verify(password: queryData.currentPassword) else {
 				let context = Context(username: user.username, success: false, error: .wrong)
