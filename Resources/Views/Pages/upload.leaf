@@ -1,8 +1,5 @@
 #extend("standard"):
 	#export("standard-head"):
-	#if(success):
-	<meta http-equiv="refresh" content="1"/>
-	#endif
 	#endexport
 	
 	#export("title"):
@@ -14,7 +11,8 @@
 	<div class="panel success">
 	Datei gespeichert
 	</div>
-	#else:
+	#endif
+	
 	<div class="panel">
 		<form id="input-form" name="input" method="post" enctype="multipart/form-data">
 			<section>
@@ -62,6 +60,5 @@
 			</section>
 		</form>
 	</div>
-	#endif
 	#endexport
 #endextend
