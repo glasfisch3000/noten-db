@@ -9,11 +9,15 @@
 	<header>
 		<div id="backdrop"> </div>
 		
-		<a id="title" class="header-item" href="/">Notenarchiv</a>
+		<a id="title" class="header-item" href="/"> Notenarchiv </a>
 		
-		<a id="new-sheet-button" class="header-item symbol" href="/upload?return=#attribute("path", "queryEncoding")">
-			􀅼
-		</a>
+		<label id="search-button" class="header-item toggle symbol">
+			<input id="search-button-input" type="checkbox">
+			􀊫
+			<div> </div>
+		</label>
+		
+		<a id="new-sheet-button" class="header-item symbol" href="/upload?return=#attribute("path", "queryEncoding")"> 􀅼 </a>
 		
 		<label id="login" class="header-item toggle symbol">
 			<input type="checkbox">
@@ -38,8 +42,19 @@
 		</a>
 	</div>
 	
+	<div id="search-container">
+		<form id="search-bar" action="search" method="get">
+			<input id="search-input" type="text" required autofocus name="search" placeholder="Noten suchen" title="Notensuche" autocomplete="off" inputmode="text"/>
+			<input class="symbol" type="submit" value="􀰑" title="Suchen"/>
+		</form>
+		
+		<div id="search-results"> </div>
+	</div>
+	
 	<div id="viewport">
 		#import("content")
 	</div>
+	
+	<script src="/js/search.js"></script>
 	#endexport
 #endextend

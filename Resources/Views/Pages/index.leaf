@@ -12,8 +12,8 @@
 		#for(sheet in sheets):
 		<div class="sheet-card">
 			<div class="buttons">
-				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
 				<a class="sheet-card-button symbol" href="/file/#(sheet.id)" download="#(sheet.title).pdf"> 􀅀 </a>
+				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
 				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=/"> 􀈑 </a>
 			</div>
 			<a href="/file/#(sheet.id)">
