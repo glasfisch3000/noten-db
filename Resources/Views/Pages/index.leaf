@@ -12,13 +12,13 @@
 		#for(sheet in sheets):
 		<div class="sheet-card">
 			<div class="buttons">
-				<a class="sheet-card-button symbol" href="/file/#(sheet.id)" download="#(sheet.title).pdf"> 􀅀 </a>
+				<a class="sheet-card-button symbol" href="/#(sheet.id)/file" download="#(sheet.title).pdf"> 􀅀 </a>
 				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
 				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=/"> 􀈑 </a>
 			</div>
-			<a href="/file/#(sheet.id)">
+			<a href="/#(sheet.id)/file">
 				<div class="content">
-					<img src="/file/#(sheet.id)" load="lazy" decoding="async"/>
+					<img src="/#(sheet.id)/file" load="lazy" decoding="async"/>
 				</div>
 				<div class="info">
 					<div class="title">
