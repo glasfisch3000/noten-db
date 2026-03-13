@@ -5,7 +5,6 @@ import NIOCore
 
 struct AuthenticatedRoutes: RouteCollection {
 	enum RequestError: Error {
-		case invalidPagingSize(UInt)
 		case invalidFormat
 	}
 	
@@ -23,48 +22,78 @@ struct AuthenticatedRoutes: RouteCollection {
 		
 		routes.get("change-password", use: getChangePassword(request:))
 		routes.on(.POST, "change-password", body: .stream, use: postChangePassword(request:))
+		
+		routes.get("search", use: getSearch(request:))
 	}
 }
 
 extension AuthenticatedRoutes {
 	func index(request: Request) async throws -> View {
+		enum SearchError: String, Error, Encodable {
+			case empty
+			case tooLarge
+			case noMatches
+		}
+		
 		struct Context: Encodable {
+			struct Search: Encodable {
+				var string: String
+				var success: Bool
+				var error: SearchError?
+			}
+			
 			var username: String
 			var sheets: [SheetDTO]
 			
-			var pageNumber: UInt
-			var pageCount: UInt
-			var pageSize: UInt
-			var total: UInt
-		}
-		
-		struct Query: Codable {
-			var page: UInt?
-			var size: UInt?
+			var search: Search?
 		}
 		
 		let user = try request.auth.require(User.self)
+		let searchString = try? request.query.get(String.self, at: "search")
 		
-		let query = try request.query.decode(Query.self)
-		if let size = query.size, size < 1 {
-			throw RequestError.invalidPagingSize(size)
+		if let searchString {
+			do {
+				if searchString.trimmingCharacters(in: .whitespacesAndNewlines + [",", ".", "_", "-"]).isEmpty {
+					throw SearchError.empty
+				}
+				
+				if searchString.count > 100 {
+					throw SearchError.tooLarge
+				}
+				
+				guard let results = try await search(searchString, on: request.db) else {
+					throw SearchError.noMatches
+				}
+				
+				let dtos = try results.map(SheetDTO.init(_:))
+				
+				let context = Context(
+					username: user.username,
+					sheets: dtos,
+					search: .init(string: searchString, success: true)
+				)
+				return try await request.view.render("Pages/index", context)
+			} catch let error as SearchError {
+				let context = Context(
+					username: user.username,
+					sheets: [],
+					search: .init(string: searchString, success: false, error: error)
+				)
+				return try await request.view.render("Pages/index", context)
+			}
+		} else {
+			let sheets = try await Sheet
+				.query(on: request.db)
+				.with(\.$createdBy)
+				.all()
+			
+			let context = Context(
+				username: user.username,
+				sheets: try sheets.map(SheetDTO.init(_:)),
+			)
+			
+			return try await request.view.render("Pages/index", context)
 		}
-		
-		let sheets = try await Sheet
-			.query(on: request.db)
-			.with(\.$createdBy)
-			.page(withIndex: Int(query.page ?? 0), size: Int(query.size ?? 30))
-		
-		let context = Context(
-			username: user.username,
-			sheets: try sheets.items.map(SheetDTO.init(_:)),
-			pageNumber: UInt(sheets.metadata.page),
-			pageCount: UInt(sheets.metadata.pageCount),
-			pageSize: UInt(sheets.metadata.per),
-			total: UInt(sheets.metadata.total)
-		)
-		
-		return try await request.view.render("Pages/index", context)
 	}
 	
 	func upload(request: Request) async throws -> View {
@@ -209,5 +238,159 @@ extension AuthenticatedRoutes {
 			let context = Context(username: user.username, success: false, error: .internal)
 			return try await request.view.render("Pages/change-password", context)
 		}
+	}
+	
+	func getSearch(request: Request) async throws -> [SheetDTO] {
+		let searchString = try request.query
+			.get(String.self, at: "search")
+		
+		if searchString.count > 100 {
+			throw RequestError.invalidFormat
+		}
+		
+		let results = try await search(searchString, on: request.db) ?? []
+		return try results.map(SheetDTO.init(_:))
+	}
+	
+	func search(_ search: String, on db: any Database) async throws -> [Sheet]? {
+		struct Match: Comparable {
+			var sheet: Sheet
+			var score: Int
+			
+			static func < (lhs: Match, rhs: Match) -> Bool {
+				lhs.score < rhs.score
+			}
+			
+			static func == (lhs: Match, rhs: Match) -> Bool {
+				lhs.score == rhs.score
+			}
+		}
+		
+		let tokens = tokenize(search)
+		if tokens.isEmpty {
+			return nil
+		}
+		
+		let allSheets = try await Sheet.query(on: db).all()
+		var matches = [Match]()
+		
+		sheet_loop: for sheet in allSheets {
+			var bestMatch = 0
+			var tokenIndex = 0
+			
+			while tokenIndex < tokens.count {
+				guard let match = findMatch(tokens, index: &tokenIndex, sheet: sheet) else {
+					continue sheet_loop
+				}
+				
+				bestMatch = max(bestMatch, match)
+			}
+			
+			matches.append(Match(sheet: sheet, score: bestMatch))
+		}
+		
+		return matches.sorted().map(\.sheet)
+	}
+	
+	// returns the length of the best match
+	func findMatch(_ tokens: [Substring], index tokenIndex: inout Int, sheet: Sheet) -> Int? {
+		enum Match {
+			case title(start: Int, end: Int)
+			case composer(start: Int, end: Int)
+			case arranger(start: Int, end: Int)
+			
+			var length: Int {
+				switch self {
+				case .title(let start, let end): end - start
+				case .composer(let start, let end): end - start
+				case .arranger(let start, let end): end - start
+				}
+			}
+		}
+		
+		// tokenize the sheet's attributes
+		// treat nonexistent composer/arranger as empty strings
+		let title = tokenize(sheet.title)
+		let composer = sheet.composer.map(tokenize(_:)) ?? []
+		let arranger = sheet.arranger.map(tokenize(_:)) ?? []
+		
+		var matches = [Match]()
+		var bestMatchLength = 1
+		
+		// add initial matches
+		matches += title
+			.indexed()
+			.compactMap { index, element in
+				guard element.starts(with: tokens[tokenIndex]) else {
+					return nil
+				}
+				
+				return Match.title(start: index, end: index+1)
+			}
+		matches += composer
+			.indexed()
+			.compactMap { index, element in
+				guard element.starts(with: tokens[tokenIndex]) else {
+					return nil
+				}
+				
+				return Match.composer(start: index, end: index+1)
+			}
+		matches += arranger
+			.indexed()
+			.compactMap { index, element in
+				guard element.starts(with: tokens[tokenIndex]) else {
+					return nil
+				}
+				
+				return Match.arranger(start: index, end: index+1)
+			}
+		
+		// if there are no intial matches, abort
+		if matches.isEmpty {
+			return nil
+		}
+		
+		// start with the next token. the current one has been checked already
+		tokenIndex += 1
+		while tokenIndex < tokens.count {
+			for (index, match) in matches.indexed() {
+				// check if each match can be expanded to the next token
+				switch match {
+				case .title(let start, let end):
+					guard end < title.count else { continue }
+					guard title[end].starts(with: tokens[tokenIndex]) else { continue }
+					matches[index] = .title(start: start, end: end+1)
+				case .composer(let start, let end):
+					guard end < composer.count else { continue }
+					guard composer[end].starts(with: tokens[tokenIndex]) else { continue }
+					matches[index] = .composer(start: start, end: end+1)
+				case .arranger(let start, let end):
+					guard end < arranger.count else { continue }
+					guard arranger[end].starts(with: tokens[tokenIndex]) else { continue }
+					matches[index] = .arranger(start: start, end: end+1)
+				}
+			}
+			
+			// remove outdated matches
+			matches.removeAll { $0.length <= bestMatchLength }
+			
+			// if there are no matches left, return
+			if matches.isEmpty {
+				return bestMatchLength
+			}
+			
+			tokenIndex += 1
+			bestMatchLength += 1
+		}
+		
+		return bestMatchLength
+	}
+	
+	func tokenize(_ string: String) -> [Substring] {
+		string
+			.lowercased()
+			.split(separator: /[\n ,._-]/)
+			.filter { !$0.isEmpty }
 	}
 }

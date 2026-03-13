@@ -1,6 +1,7 @@
 import struct Foundation.UUID
+import protocol Vapor.Content
 
-struct SheetDTO: Codable {
+struct SheetDTO: Codable, Content {
 	struct Creator: Codable {
 		var username: String
 	}

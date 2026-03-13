@@ -18,7 +18,7 @@ searchInput.addEventListener("input", (event) => {
 	
 	controller = new AbortController()
 	
-	fetch("/search/api?search=" + encodeURIComponent(searchInput.value), {
+	fetch("/search?search=" + encodeURIComponent(searchInput.value), {
 		method: "get",
 		signal: controller.signal,
 	})
@@ -26,13 +26,47 @@ searchInput.addEventListener("input", (event) => {
 	.catch(cancelSearch)
 })
 
-function applySearch(response) {
-	console.log(response)
+async function applySearch(response) {
+	searchResults.textContent = ""
+	
 	if (response.ok) {
-		// TODO
+		let sheets = await response.json()
+		for (let sheet of sheets) {
+			let parent = document.createElement("div")
+			parent.classList.add("search-item")
+			searchResults.appendChild(parent)
+			
+			let preview = document.createElement("div")
+			preview.classList.add("item-preview")
+			parent.appendChild(preview)
+			let img = document.createElement("img")
+			img.src = `/${sheet.id}/file`
+			preview.appendChild(img)
+			
+			let info = document.createElement("div")
+			info.classList.add("item-info")
+			parent.appendChild(info)
+			
+			let title = document.createElement("div")
+			title.classList.add("item-title")
+			title.textContent = sheet.title
+			info.appendChild(title)
+			
+			if (sheet.composer) {
+				let composer = document.createElement("div")
+				composer.classList.add("item-composer")
+				composer.textContent = sheet.composer
+				info.appendChild(composer)
+			}
+			
+			if (sheet.arranger) {
+				let arranger = document.createElement("div")
+				arranger.classList.add("item-arranger")
+				arranger.textContent = sheet.arranger
+				info.appendChild(arranger)
+			}
+		}
 	} else {
-		searchResults.textContent = ""
-		
 		let error = document.createElement("div")
 		error.classList.add("error")
 		error.textContent = "Suche fehlgeschlagen"

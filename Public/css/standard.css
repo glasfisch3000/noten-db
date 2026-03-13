@@ -245,6 +245,10 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 	color: inherit;
 }
 
+#search-results > *:not(:first-child) {
+	margin-top: 0.5em;
+}
+
 #search-results > .error {
 	border-radius: 0.8em;
 	box-sizing: border-box;
@@ -256,4 +260,43 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 	
 	text-align: center;
 	background: #c11a;
+}
+
+.search-item {
+	display: flex;
+	align-items: center;
+}
+.search-item .item-preview {
+	min-width: 7em;
+	max-width: 7em;
+	height: 3.5em;
+	overflow-y: hidden;
+	
+	border-radius: 0.5em;
+	margin-right: 1em;
+}
+.search-item .item-preview img {
+	max-width: 100%;
+	background: #fff;
+}
+.search-item .item-info {
+	font-weight: bolder;
+	min-width: 0;
+}
+.search-item .item-info > *:not(:last-child) {
+	/* spacing between the lines */
+	margin-bottom: 0.05em;
+}
+.search-item .item-title {
+	font-size: 110%;
+	overflow-wrap: break-word;
+}
+.search-item .item-composer, .search-item .item-arranger {
+	opacity: 80%;
+	font-size: 80%;
+	overflow-wrap: break-word;
+}
+.search-item .item-arranger::before {
+	content: "Satz: ";
+	font-weight: normal;
 }
