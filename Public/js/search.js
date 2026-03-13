@@ -5,6 +5,7 @@ searchButton.addEventListener("change", (event) => {
 		searchInput.focus()
 	} else {
 		controller.abort()
+		cancelSearch()
 	}
 })
 
@@ -32,8 +33,9 @@ async function applySearch(response) {
 	if (response.ok) {
 		let sheets = await response.json()
 		for (let sheet of sheets) {
-			let parent = document.createElement("div")
+			let parent = document.createElement("a")
 			parent.classList.add("search-item")
+			parent.href = `/${sheet.id}/file`
 			searchResults.appendChild(parent)
 			
 			let preview = document.createElement("div")
@@ -76,4 +78,5 @@ async function applySearch(response) {
 
 function cancelSearch(error) {
 	searchResults.textContent = ""
+	searchInput.value = ""
 }

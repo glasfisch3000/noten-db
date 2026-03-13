@@ -171,6 +171,7 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 	position: fixed;
 	inset: 0;
 	top: 25%;
+	bottom: 1em;
 	z-index: 9;
 	
 	margin-left: auto;
@@ -245,12 +246,34 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 	color: inherit;
 }
 
-#search-results > *:not(:first-child) {
-	margin-top: 0.5em;
+#search-results {
+	border: 1px solid #8888;
+	border-radius: 1em;
+	padding: 0.4em;
+	padding-left: 0.4em;
+	padding-right: 0.4em;
+	max-height: calc(100% - 2.4em - 2px - 2em); /* 100% - (size of search bar) - (search bar border) - (margin) */
+	overflow-y: scroll;
+	box-sizing: border-box;
+	
+	background: #222a;
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+}
+#search-results:empty::before {
+	padding: 0.35em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	content: "Keine Suchergebnisse";
+}
+#search-results > * {
+	padding: 0.35em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
 }
 
 #search-results > .error {
-	border-radius: 0.8em;
+	border-radius: 0.7em;
 	box-sizing: border-box;
 	
 	padding-left: 0.6em;
@@ -265,6 +288,12 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 .search-item {
 	display: flex;
 	align-items: center;
+	color: inherit;
+	text-decoration: none;
+}
+.search-item:hover {
+	border-radius: 0.7em;
+	background: #9a55a388;
 }
 .search-item .item-preview {
 	min-width: 7em;
@@ -299,4 +328,15 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 .search-item .item-arranger::before {
 	content: "Satz: ";
 	font-weight: normal;
+}
+.search-item::after {
+	content: "􀰑";
+	font-family: SFPro;
+	margin-left: auto;
+	padding-left: 0.5em;
+	padding-right: 0.3em;
+	opacity: 0;
+}
+.search-item:hover::after {
+	opacity: inherit;
 }
