@@ -39,8 +39,8 @@
 		<div class="sheet-card">
 			<div class="buttons">
 				<a class="sheet-card-button symbol" href="/#(sheet.id)/file" download="#(sheet.title).pdf"> 􀅀 </a>
-				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=/"> 􂽱 </a>
-				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=/"> 􀈑 </a>
+				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=#attribute("path", "queryEncoding")"> 􂽱 </a>
+				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=#attribute("path", "queryEncoding")"> 􀈑 </a>
 			</div>
 			<a href="/#(sheet.id)/file">
 				<div class="content">
