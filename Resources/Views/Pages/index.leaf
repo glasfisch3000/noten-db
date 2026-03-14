@@ -8,6 +8,32 @@
 	#endexport
 	
 	#export("content"):
+	#if(search):
+	<div id="search-info">
+		#if(search.success):
+		
+		<div class="symbol"> 􀭥 </div>
+		<div> Suche: "#(search.string)" </div>
+		<a id="clear-search" class="symbol" href="/"> 􀆄 </a>
+		
+		#else:
+		
+		<div class="symbol"> 􂈂 </div>
+		<div class="error">
+		#if(search.error == "empty" || search.error == "tooLarge"):
+		Ungültige Sucheingabe
+		#elseif(search.error == "noMatches"):
+		Keine Suchergebnisse gefunden
+		#else:
+		Suche fehlgeschlagen
+		#endif
+		</div>
+		<a id="clear-search" class="symbol" href="/"> 􀆄 </a>
+		
+		#endif
+	</div>
+	#endif
+	
 	<div id="content">
 		#for(sheet in sheets):
 		<div class="sheet-card">

@@ -53,15 +53,15 @@ extension AuthenticatedRoutes {
 		
 		if let searchString {
 			do {
-				if searchString.trimmingCharacters(in: .whitespacesAndNewlines + [",", ".", "_", "-"]).isEmpty {
-					throw SearchError.empty
-				}
-				
 				if searchString.count > 100 {
 					throw SearchError.tooLarge
 				}
 				
 				guard let results = try await search(searchString, on: request.db) else {
+					throw SearchError.empty
+				}
+				
+				if results.isEmpty {
 					throw SearchError.noMatches
 				}
 				
