@@ -27,7 +27,6 @@ let package = Package(
 				.product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
 				.product(name: "Leaf", package: "leaf"),
 			],
-			path: "Sources"
         ),
     ]
 )
