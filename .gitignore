@@ -7,4 +7,5 @@ DerivedData/
 .netrc
 
 /sheets
+/thumbnails
 /.env

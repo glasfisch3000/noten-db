@@ -156,7 +156,7 @@ extension AuthenticatedRoutes {
 				)
 				try await sheet.create(on: db)
 				
-				try await storage.create(sheetID: try sheet.requireID(), contents: uploadData.file)
+				try await storage.create(try sheet.requireID(), sheet: uploadData.file)
 			}
 			
 			let context = Context(username: user.username, success: true)

@@ -21,8 +21,11 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 		guard let sheetStorage = Environment.get("NOTEN_DB_SHEET_STORAGE") else {
 			throw AppError.missingEnvParameter(.sheetStorage)
 		}
+		guard let thumbnailStorage = Environment.get("NOTEN_DB_THUMBNAIL_STORAGE") else {
+			throw AppError.missingEnvParameter(.thumbnailStorage)
+		}
 		
-		let storage = FileStorage(parentDir: FilePath(sheetStorage))
+		let storage = FileStorage(sheets: FilePath(sheetStorage), thumbnails: FilePath(thumbnailStorage))
 		
 		guard let hostname = Environment.get("NOTEN_DB_HOSTNAME") else {
 			throw AppError.missingEnvParameter(.dbHostname)

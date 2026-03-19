@@ -10,7 +10,8 @@ struct ItemRoutes: RouteCollection {
 	var storage: FileStorage
 	
 	func boot(routes: any RoutesBuilder) throws {
-		routes.get("file", use: getFile(request:))
+		routes.get("file.pdf", use: getFile(request:))
+		routes.get("thumbnail.png", use: getThumbnail(request:))
 		
 		routes.get("delete", use: getDeleteItem(request:))
 		routes.post("delete", use: postDeleteItem(request:))
@@ -42,11 +43,23 @@ extension ItemRoutes {
 			throw Abort(.notFound)
 		}
 		
-		guard let (path, _) = try await storage.getInfo(sheetID: id) else {
+		guard let (path, _) = try await storage.getSheet(id) else {
 			throw Abort(.notFound)
 		}
 		
-		return try await request.fileio.asyncStreamFile(at: path.string, mediaType: .pdf, advancedETagComparison: true)
+		return try await request.fileio.asyncStreamFile(at: path.string, mediaType: .pdf)
+	}
+	
+	func getThumbnail(request: Request) async throws -> Response {
+		guard let id = request.parameters.get("id", as: UUID.self) else {
+			throw Abort(.notFound)
+		}
+		
+		guard let path = try await storage.getThumbnailOrConvert(id) else {
+			throw Abort(.notFound)
+		}
+		
+		return try await request.fileio.asyncStreamFile(at: path.string, mediaType: .png)
 	}
 	
 	// get the confirmation page for deleting a sheet
@@ -84,7 +97,7 @@ extension ItemRoutes {
 					.filter(\.$id == sheetID)
 					.delete()
 				
-				try await storage.remove(sheetID: sheetID)
+				try await storage.remove(sheetID)
 			}
 			success = true
 		} catch {

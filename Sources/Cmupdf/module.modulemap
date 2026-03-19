@@ -1,0 +1,5 @@
+module Cmupdf [system] {
+	header "include/Cmupdf/Cmupdf.h"
+	link "fitz"
+	export *
+}

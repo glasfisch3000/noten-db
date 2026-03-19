@@ -1,7 +1,7 @@
 enum AppError: Error, CustomStringConvertible {
 	enum ApplicationParameter: Sendable, CustomStringConvertible {
 		case dbHostname, dbPort, dbUsername, dbPassword, dbName
-		case sheetStorage
+		case sheetStorage, thumbnailStorage
 		
 		var description: String {
 			switch self {
@@ -11,6 +11,7 @@ enum AppError: Error, CustomStringConvertible {
 			case .dbPassword: "postgres password"
 			case .dbName: "postgres database name"
 			case .sheetStorage: "sheet storage path"
+			case .thumbnailStorage: "thumbnail storage path"
 			}
 		}
 	}

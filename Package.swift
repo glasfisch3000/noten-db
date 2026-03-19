@@ -26,7 +26,28 @@ let package = Package(
 				.product(name: "Fluent", package: "fluent"),
 				.product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
 				.product(name: "Leaf", package: "leaf"),
+				.target(name: "ConvertPDF"),
 			],
+			swiftSettings: [.interoperabilityMode(.C)]
         ),
+		.systemLibrary(
+			name: "Cmupdf",
+			pkgConfig: "mupdf",
+			providers: [
+				.brew(["mupdf"]),
+				.apt(["libmupdf-dev"]),
+			]
+		),
+		.target(
+			name: "ConvertPDF",
+			dependencies: [
+				.target(name: "Cmupdf"),
+			],
+			publicHeadersPath: "include",
+			cSettings: [
+				.headerSearchPath("include"),
+				.define("SWIFT_PACKAGE"),
+			]
+		)
     ]
 )

@@ -35,14 +35,14 @@ async function applySearch(response) {
 		for (let sheet of sheets) {
 			let parent = document.createElement("a")
 			parent.classList.add("search-item")
-			parent.href = `/${sheet.id}/file`
+			parent.href = `/${sheet.id}/file.pdf`
 			searchResults.appendChild(parent)
 			
 			let preview = document.createElement("div")
 			preview.classList.add("item-preview")
 			parent.appendChild(preview)
 			let img = document.createElement("img")
-			img.src = `/${sheet.id}/file`
+			img.src = `/${sheet.id}/thumbnail.png`
 			preview.appendChild(img)
 			
 			let info = document.createElement("div")

@@ -38,13 +38,13 @@
 		#for(sheet in sheets):
 		<div class="sheet-card">
 			<div class="buttons">
-				<a class="sheet-card-button symbol" href="/#(sheet.id)/file" download="#(sheet.title).pdf"> 􀅀 </a>
+				<a class="sheet-card-button symbol" href="/#(sheet.id)/file.pdf" download="#(sheet.title).pdf"> 􀅀 </a>
 				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=#attribute("path", "queryEncoding")"> 􂽱 </a>
 				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=#attribute("path", "queryEncoding")"> 􀈑 </a>
 			</div>
-			<a href="/#(sheet.id)/file">
+			<a href="/#(sheet.id)/file.pdf">
 				<div class="content">
-					<img src="/#(sheet.id)/file" load="lazy" decoding="async"/>
+					<img src="/#(sheet.id)/thumbnail.png" load="lazy" decoding="async"/>
 				</div>
 				<div class="info">
 					<div class="title">

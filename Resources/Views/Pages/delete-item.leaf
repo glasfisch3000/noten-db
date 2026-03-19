@@ -20,7 +20,7 @@
 		<form id="delete-form" name="delete" method="post">
 			<section id="sheet-info">
 				<div id="sheet-preview">
-					<img src="/#(sheet.id)/file">
+					<img src="/#(sheet.id)/thumbnail.png">
 				</div>
 				<div id="sheet-info-text">
 					<div id="sheet-title"> #(sheet.title) </div>
