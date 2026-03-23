@@ -1,0 +1,116 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: glasfisch3000/noten-db
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    container: swift:6.2.4-noble
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # install zstd algorithm for faster caching
+      - name: Install zstd
+        run: apt-get update -y && apt-get install -y zstd
+
+      # restore cached swift build artifacts
+      - name: Restore .build
+        if: ${{ !(github.run_attempt > 1) }}
+        id: "restore-build"
+        uses: actions/cache/restore@v4
+        with:
+          path: .build
+          key: "swiftpm-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "swiftpm-build-${{ runner.os }}-"
+
+      # build the app since that's no longer happening in the dockerfile
+      - name: Build app
+        run: |
+          apt-get update -y
+          apt-get install -y libjemalloc-dev
+          apt-get install -y libmupdf-dev
+
+          # build the application, with optimizations, static linking and jemalloc
+          swift build --configuration release --product App --static-swift-stdlib -Xlinker -ljemalloc $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
+
+      # cache swift build artifacts
+      - name: Cache .build
+        if: steps.restore-build.outputs.cache-hit != "true"
+        uses: actions/cache/save@v4
+        with:
+          path: .build
+          key: "swiftpm-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+
+      # install docker since we're working in the swift container
+      - name: Install docker
+        run: |
+          set -eu
+
+          # installation commands from https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository:
+
+          # add docker's official GPG key:
+          apt-get update -y
+          apt-get install ca-certificates curl gnupg -y
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          chmod a+r /etc/apt/keyrings/docker.gpg
+
+          # add the repository to apt sources:
+          echo "deb [arch=\"$(dpkg --print-architecture)\" signey-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \"$(. /etc/os-release && echo "$VERSION_CODENAME")\" stable" | tee /etc/apt/sources.list.d/docker.list >/dev/null
+          apt-get update -y
+
+          # install docker:
+          apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+      # set up BuildKit docker container builder to be able to build
+      # multi-platform images and export cache
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+
+      # login against a docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != "pull_request"
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # extract metadata (tags, labels) for docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      # build and push docker image with buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: .
+          file: ./Dockerfile_workflow
+          push: ${{ github.event_name != "pull_request" }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

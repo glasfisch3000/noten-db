@@ -1,0 +1,56 @@
+x-shared_environment: &shared_environment
+  NOTEN_DB_SHEET_STORAGE: /notendb/sheets
+  NOTEN_DB_THUMBNAIL_STORAGE: /notendb/thumbnails
+  NOTEN_DB_HOSTNAME: localhost
+  NOTEN_DB_PORT: 5432
+  NOTEN_DB_DATABASE: notendb
+  NOTEN_DB_USERNAME: notendb
+  NOTEN_DB_PASSWORD: notendb
+
+services:
+  app:
+    image: ghcr.io/glasfisch3000/notendb:main
+    environment:
+      <<: *shared_environment
+    depends_on: [db]
+    ports: [1618:8080]
+    volumes:
+      - ./sheets:/notendb/sheets
+      - ./thumbnails:/notendb/thumbnails
+    networks: [notendb]
+    command: "serve --hostname 0.0.0.0 --port 8080"
+  migrate:
+    image: ghcr.io/glasfisch3000/notendb:main
+    environment:
+      <<: *shared_environment
+    depends_on: [db]
+    networks: [notendb]
+    deploy:
+      replicas: 0
+    command: "migrate --yes"
+  revert:
+    image: ghcr.io/glasfisch3000/notendb:main
+    environment:
+      <<: *shared_environment
+    depends_on: [db]
+    networks: [notendb]
+    deploy:
+      replicas: 0
+    command: "migrate --revert --yes"
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data/pgdata
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: notendb
+      POSTGRES_USER: notendb
+      POSTGRES_PASSWORD: notendb
+    ports: [5432:5432]
+    networks: [notendb]
+
+volumes:
+  db_data:
+
+networks:
+  notendb:
