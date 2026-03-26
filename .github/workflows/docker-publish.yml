@@ -43,10 +43,10 @@ jobs:
         run: |
           apt-get update -y
           apt-get install -y libjemalloc-dev
-          apt-get install -y libmupdf-dev
+          apt-get install -y libfreetype-dev libmujs-dev libjpeg-dev libgumbo-dev libopenjp2-7-dev libjbig2dec-dev libharfbuzz-dev libmupdf-dev
 
           # build the application, with optimizations, static linking and jemalloc
-          swift build --configuration release --product App --static-swift-stdlib -Xlinker -ljemalloc $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
+          swift build --configuration release --product App --static-swift-stdlib -Xlinker -ljemalloc -Xlinker -lmupdf -Xlinker -lmupdf-third -Xlinker -lmujs -Xlinker -lfreetype -Xlinker -ljpeg -Xlinker -lgumbo -Xlinker -lopenjp2 -Xlinker -ljbig2dec -Xlinker -lharfbuzz $([ -f ./Package.resolved ] && echo "--force-resolved-versions" || true)
 
       # cache swift build artifacts
       - name: Cache .build

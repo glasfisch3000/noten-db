@@ -8,7 +8,7 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
     && apt-get -q update \
     && apt-get -q dist-upgrade -y \
     && apt-get install -y libjemalloc-dev \
-    && apt-get install -y libfreetype-dev libmupdf-dev \
+    && apt-get install -y libfreetype-dev libmujs-dev libjpeg-dev libgumbo-dev libopenjp2-7-dev libjbig2dec-dev libharfbuzz-dev libmupdf-dev \
     && apt-get install -y pkgconf
 
 # Set up a build area
@@ -26,7 +26,7 @@ COPY . .
 
 # Build everything, with optimizations, with static linking, and using jemalloc
 # N.B.: The static version of jemalloc is incompatible with the static Swift runtime.
-RUN swift build --configuration release --static-swift-stdlib -Xlinker -ljemalloc
+RUN swift build --configuration release --static-swift-stdlib -Xlinker -ljemalloc -Xlinker -lmupdf -Xlinker -lmupdf-third -Xlinker -lmujs -Xlinker -lfreetype -Xlinker -ljpeg -Xlinker -lgumbo -Xlinker -lopenjp2 -Xlinker -ljbig2dec -Xlinker -lharfbuzz
 
 # Switch to the staging area
 WORKDIR /staging
