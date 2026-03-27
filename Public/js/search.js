@@ -6,6 +6,7 @@ searchButton.addEventListener("change", (event) => {
 	} else {
 		controller.abort()
 		cancelSearch()
+		searchInput.value = ""
 	}
 })
 
@@ -78,5 +79,4 @@ async function applySearch(response) {
 
 function cancelSearch(error) {
 	searchResults.textContent = ""
-	searchInput.value = ""
 }
