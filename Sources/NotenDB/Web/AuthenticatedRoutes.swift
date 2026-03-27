@@ -390,7 +390,7 @@ extension AuthenticatedRoutes {
 	func tokenize(_ string: String) -> [Substring] {
 		string
 			.lowercased()
-			.split(separator: /[\n ,._-]/)
+			.split(separator: /[\n\t ,;.…:_\-–—~()\[\]{}\/\\|"„““”''‘’´`+*#?¿!¡&%$§<>]/)
 			.filter { !$0.isEmpty }
 	}
 }
