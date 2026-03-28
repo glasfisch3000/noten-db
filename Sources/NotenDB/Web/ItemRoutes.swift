@@ -39,11 +39,9 @@ struct ItemRoutes: RouteCollection {
 
 extension ItemRoutes {
 	func getFile(request: Request) async throws -> Response {
-		guard let id = request.parameters.get("id", as: UUID.self) else {
-			throw Abort(.notFound)
-		}
+		let sheet = try await fetchSheet(request)
 		
-		guard let (path, _) = try await storage.getSheet(id) else {
+		guard let (path, _) = try await storage.getSheet(try sheet.requireID()) else {
 			throw Abort(.notFound)
 		}
 		
@@ -51,11 +49,9 @@ extension ItemRoutes {
 	}
 	
 	func getThumbnail(request: Request) async throws -> Response {
-		guard let id = request.parameters.get("id", as: UUID.self) else {
-			throw Abort(.notFound)
-		}
+		let sheet = try await fetchSheet(request)
 		
-		guard let path = try await storage.getThumbnailOrConvert(id) else {
+		guard let path = try await storage.getThumbnailOrConvert(try sheet.requireID()) else {
 			throw Abort(.notFound)
 		}
 		
@@ -95,9 +91,7 @@ extension ItemRoutes {
 			try await request.db.transaction { db in
 				try await Sheet.query(on: db)
 					.filter(\.$id == sheetID)
-					.delete()
-				
-				try await storage.remove(sheetID)
+					.delete(force: false)
 			}
 			success = true
 		} catch {
