@@ -40,12 +40,20 @@ struct ItemRoutes: RouteCollection {
 extension ItemRoutes {
 	func getFile(request: Request) async throws -> Response {
 		let sheet = try await fetchSheet(request)
+		let download = (try? request.query.get(Bool.self, at: "download")) ?? false
 		
 		guard let (path, _) = try await storage.getSheet(try sheet.requireID()) else {
 			throw Abort(.notFound)
 		}
 		
-		return try await request.fileio.asyncStreamFile(at: path.string, mediaType: .pdf)
+		let response = try await request.fileio.asyncStreamFile(at: path.string, mediaType: .pdf)
+		if download {
+			response.headers.contentDisposition = .init(.attachment)
+		}
+		
+		print(response.headers)
+		
+		return response
 	}
 	
 	func getThumbnail(request: Request) async throws -> Response {
