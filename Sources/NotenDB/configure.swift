@@ -65,6 +65,7 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 		app.migrations.add(User.CreateUserMigration())
 		app.migrations.add(Sheet.CreateSheetMigration())
 		app.migrations.add(Sheet.DeleteYearMigration())
+		app.migrations.add(Sheet.AddSoftDeleteMigration())
 		
 		// add leaf rendering
 		app.views.use(.leaf)

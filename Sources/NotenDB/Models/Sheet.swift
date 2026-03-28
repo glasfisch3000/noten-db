@@ -19,6 +19,9 @@ final class Sheet: Model, @unchecked Sendable {
 	@Parent(key: "created_by")
 	var createdBy: User
 	
+	@Timestamp(key: "deleted_at", on: .delete)
+	var deletedAt: Date?
+	
 	init() { }
 	
 	init(id: UUID? = nil, title: String, composer: String?, arranger: String?, createdBy: User.IDValue) {
@@ -27,6 +30,7 @@ final class Sheet: Model, @unchecked Sendable {
 		self.composer = composer
 		self.arranger = arranger
 		self.$createdBy.id = createdBy
+		self.deletedAt = nil
 	}
 }
 
@@ -63,6 +67,22 @@ extension Sheet {
 		func revert(on database: any Database) async throws {
 			try await database.schema("sheets")
 				.field("year", .int)
+				.update()
+		}
+	}
+	
+	struct AddSoftDeleteMigration: AsyncMigration {
+		var name: String { "NotenDB.AddSoftDeleteMigration" }
+		
+		func prepare(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.field("deleted_at", .datetime)
+				.update()
+		}
+		
+		func revert(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.deleteField("deleted_at")
 				.update()
 		}
 	}
