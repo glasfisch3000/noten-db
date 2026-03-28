@@ -1,7 +1,16 @@
 #content {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 12em);
+	
+	/* 2x7em columns at 20em page width, 2x9.5em at 25em */
+	grid-template-columns: repeat(auto-fill, clamp(7em, calc(50vw - 3em), 9.5em));
 	gap: 1em;
+}
+
+@media screen and (width >= 25rem) {
+	#content {
+		/* 2x9.5em columns at 25em page width, 3x9.5em at 36.5em, 5x12em at 69em */
+		grid-template-columns: repeat(auto-fill, clamp(9.5em, calc(7.69vw + 6.69em), 12em));
+	}
 }
 
 #search-info {
@@ -109,9 +118,16 @@
 .sheet-card .content {
 	margin: 0;
 	padding: 0;
-	max-height: 10em;
+	height: clamp(5em, calc(40vw - 3em), 7em);
 	display: flex;
 	overflow: hidden;
+}
+
+@media screen and (width >= 25rem) {
+	.sheet-card .content {
+		/* 7em height at 25-36.5em page width, 9em at 69em */
+		height: clamp(7em, calc(6.15vw + 4.75em), 9em);
+	}
 }
 
 .sheet-card .content img {

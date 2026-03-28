@@ -9,9 +9,9 @@
 }
 
 #sheet-preview {
-	min-width: 9em;
-	max-width: 9em;
-	height: 5em;
+	/* responsive width/height that fits all screens */
+	width: clamp(6em, 15vw, 9em);
+	height: clamp(4em, calc(5vw + 2em), 5em);
 	overflow-y: hidden;
 	
 	border-radius: 0.5em;
