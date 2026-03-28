@@ -132,7 +132,6 @@ extension ItemRoutes {
 			var title: String
 			var composer: String?
 			var arranger: String?
-			var year: Int?
 			
 			init(from decoder: any Decoder) throws {
 				let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -145,8 +144,6 @@ extension ItemRoutes {
 				
 				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
 				if let arranger, arranger.isEmpty { self.arranger = nil }
-				
-				self.year = try container.decodeIfPresent(String.self, forKey: .year).flatMap(Int.init(_:))
 			}
 		}
 		
@@ -160,7 +157,6 @@ extension ItemRoutes {
 			sheet.title = edit.title
 			sheet.composer = edit.composer
 			sheet.arranger = edit.arranger
-			sheet.year = edit.year
 			try await sheet.update(on: request.db)
 			
 			let context = Context(username: user.username, sheet: try .init(sheet), success: true)

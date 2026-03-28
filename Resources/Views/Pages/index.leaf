@@ -51,7 +51,6 @@
 						#(sheet.title)
 					</div>
 					
-					#if(sheet.composer || sheet.arranger || sheet.year):
 					<div class="other-info">
 						#if(sheet.composer):
 						<span class="composer">#(sheet.composer)</span>
@@ -65,7 +64,6 @@
 						Satz: <span class="arranger">#(sheet.arranger)</span>
 						#endif
 					</div>
-					#endif
 				</div>
 			</a>
 		</div>

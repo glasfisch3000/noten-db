@@ -106,7 +106,6 @@ extension AuthenticatedRoutes {
 			var title: String
 			var composer: String?
 			var arranger: String?
-			var year: Int?
 			var file: Data
 			
 			init(from decoder: any Decoder) throws {
@@ -121,7 +120,6 @@ extension AuthenticatedRoutes {
 				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
 				if let arranger, arranger.isEmpty { self.arranger = nil }
 				
-				self.year = try container.decodeIfPresent(String.self, forKey: .year).flatMap(Int.init(_:))
 				self.file = try container.decode(Data.self, forKey: .file)
 			}
 		}
@@ -151,7 +149,6 @@ extension AuthenticatedRoutes {
 					title: uploadData.title,
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
-					year: uploadData.year,
 					createdBy: try user.requireID()
 				)
 				try await sheet.create(on: db)

@@ -16,20 +16,16 @@ final class Sheet: Model, @unchecked Sendable {
 	@Field(key: "arranger")
 	var arranger: String?
 	
-	@Field(key: "year")
-	var year: Int?
-	
 	@Parent(key: "created_by")
 	var createdBy: User
 	
 	init() { }
 	
-	init(id: UUID? = nil, title: String, composer: String?, arranger: String?, year: Int?, createdBy: User.IDValue) {
+	init(id: UUID? = nil, title: String, composer: String?, arranger: String?, createdBy: User.IDValue) {
 		self.id = id
 		self.title = title
 		self.composer = composer
 		self.arranger = arranger
-		self.year = year
 		self.$createdBy.id = createdBy
 	}
 }
