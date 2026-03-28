@@ -27,6 +27,7 @@
 	
 	font-size: 110%;
 	display: flex;
+	align-items: center;
 }
 #search-info:has(> .error) {
 	background-color: #e228;
