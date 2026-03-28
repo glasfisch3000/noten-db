@@ -62,8 +62,9 @@ internal func configureApplication(_ args: [String] = []) async throws -> (Appli
 			as: .psql
 		)
 		
-		app.migrations.add(CreateUserMigration())
-		app.migrations.add(CreateSheetMigration())
+		app.migrations.add(User.CreateUserMigration())
+		app.migrations.add(Sheet.CreateSheetMigration())
+		app.migrations.add(Sheet.DeleteYearMigration())
 		
 		// add leaf rendering
 		app.views.use(.leaf)

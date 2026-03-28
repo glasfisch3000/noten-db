@@ -38,19 +38,23 @@ final class User: Model, @unchecked Sendable, ModelSessionAuthenticatable {
 	}
 }
 
-struct CreateUserMigration: AsyncMigration {
-	func prepare(on database: any Database) async throws {
-		try await database.schema("users")
-			.id()
-			.field("username", .string, .required)
-			.field("salt", .uuid, .required)
-			.field("passwordSHA256", .data, .required)
-			.unique(on: "username")
-			.create()
-	}
-	
-	func revert(on database: any Database) async throws {
-		try await database.schema("users")
-			.delete()
+extension User {
+	struct CreateUserMigration: AsyncMigration {
+		var name: String { "NotenDB.CreateUserMigration" }
+		
+		func prepare(on database: any Database) async throws {
+			try await database.schema("users")
+				.id()
+				.field("username", .string, .required)
+				.field("salt", .uuid, .required)
+				.field("passwordSHA256", .data, .required)
+				.unique(on: "username")
+				.create()
+		}
+		
+		func revert(on database: any Database) async throws {
+			try await database.schema("users")
+				.delete()
+		}
 	}
 }
