@@ -1,0 +1,52 @@
+#extend("standard"):
+	#export("standard-head"):
+	#if(success):
+	<meta http-equiv="refresh" content="1;url=#attribute("return")"/>
+	#endif
+	#endexport
+	
+	#export("title"):
+	Notenarchiv - Benutzername ändern
+	#endexport
+	
+	#export("content"):
+	#if(success):
+	<div class="panel success">
+	Benutzername gespeichert
+	</div>
+	#else:
+	<div class="panel">
+		<form id="username-form" name="change-username" method="post">
+			<section>
+				<label for="new-username"> Neuer Benutzername </label>
+				<input type="text" required name="new-username" placeholder="Neuer Benutzername" title="Neuer Benutzername" inputmode="text"/>
+				
+				<label for="password"> Passwort </label>
+				<input type="password" required name="password" placeholder="Passwort" title="Passwort" autocomplete="current-password password" inputmode="text"/>
+			</section>
+			
+			<section class="submit-section">
+				#if(error):
+				<div class="error">
+					#if(error == "unreadable"):
+					Fehler: Unlesbare oder falsch formatierte Daten. Das ist entweder ein Bug oder deine Schuld. Versuch es nochmal.
+					#elseif(error == "wrong"):
+					Falsches Passwort. Versuch es nochmal.
+					#elseif(error == "invalid"):
+					Ungültiger neuer Benutzername. Versuch es nochmal.
+					#elseif(error == "internal"):
+					Ein interner Fehler ist aufgetreten. Das ist nicht so gedacht und wahrscheinlich ein Bug. Versuch es nochmal.
+					#else:
+					Ein unbekannter Fehler ist aufgetreten. Bitte kontaktiere den Entwickler und schrei ihn an. Oder versuch es nochmal.
+					#endif
+				</div>
+				#endif
+				
+				<input id="submit" class="submit-button" type="submit" value="Speichern" title="Speichern"/>
+				<a id="cancel" class="submit-button cancel" href="#attribute("return")"> Abbrechen </a>
+			</section>
+		</form>
+	</div>
+	#endif
+	#endexport
+#endextend

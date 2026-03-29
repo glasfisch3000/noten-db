@@ -20,6 +20,8 @@ struct AuthenticatedRoutes: RouteCollection {
 			.grouped(":id")
 			.register(collection: ItemRoutes(storage: storage))
 		
+		routes.get("change-username", use: getChangeUsername(request:))
+		routes.on(.POST, "change-username", body: .stream, use: postChangeUsername(request:))
 		routes.get("change-password", use: getChangePassword(request:))
 		routes.on(.POST, "change-password", body: .stream, use: postChangePassword(request:))
 		
@@ -175,6 +177,65 @@ extension AuthenticatedRoutes {
 		} catch {
 			let context = Context(user: try UserDTO(user), success: false, error: .internal)
 			return try await request.view.render("Pages/upload", context)
+		}
+	}
+	
+	func getChangeUsername(request: Request) async throws -> View {
+		let user = try request.auth.require(User.self)
+		return try await request.view.render("Pages/change-username", ["user": try UserDTO(user)])
+	}
+	
+	func postChangeUsername(request: Request) async throws -> View {
+		enum PostError: String, Codable {
+			case unreadable
+			case `internal`
+			case wrong
+			case invalid
+		}
+		
+		struct Context: Encodable {
+			var user: UserDTO
+			var success: Bool
+			var error: PostError? = nil
+		}
+		
+		struct Query: Codable {
+			enum CodingKeys: String, CodingKey {
+				case newUsername = "new-username"
+				case password
+			}
+			
+			var newUsername: String
+			var password: String
+		}
+		
+		let user = try request.auth.require(User.self)
+		
+		do {
+			// collect data
+			let queryData = try await request.decodeBody(Query.self, as: .urlEncodedForm, maxBytes: 2_000) // 2KB
+			
+			guard user.verify(password: queryData.password) else {
+				let context = Context(user: try UserDTO(user), success: false, error: .wrong)
+				return try await request.view.render("Pages/change-username", context)
+			}
+			
+			if queryData.newUsername.isEmpty {
+				let context = Context(user: try UserDTO(user), success: false, error: .invalid)
+				return try await request.view.render("Pages/change-username", context)
+			}
+			
+			user.username = queryData.newUsername
+			try await user.update(on: request.db)
+			
+			let context = Context(user: try UserDTO(user), success: true)
+			return try await request.view.render("Pages/change-username", context)
+		} catch _ as NIOTooManyBytesError, _ as Abort, _ as DecodingError {
+			let context = Context(user: try UserDTO(user), success: false, error: .unreadable)
+			return try await request.view.render("Pages/change-username", context)
+		} catch {
+			let context = Context(user: try UserDTO(user), success: false, error: .internal)
+			return try await request.view.render("Pages/change-username", context)
 		}
 	}
 	

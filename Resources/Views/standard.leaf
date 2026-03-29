@@ -34,6 +34,10 @@
 		
 		<hr/>
 		
+		<a class="dropdown-button" href="/change-username?return=#attribute("path", "queryEncoding")">
+			<span class="symbol"> 􀯩 </span>
+			Benutzername ändern
+		</a>
 		<a class="dropdown-button" href="/change-password?return=#attribute("path", "queryEncoding")">
 			<span class="symbol"> 􀎤 </span>
 			Passwort ändern
