@@ -42,7 +42,7 @@ extension AuthenticatedRoutes {
 				var error: SearchError?
 			}
 			
-			var username: String
+			var user: UserDTO
 			var sheets: [SheetDTO]
 			
 			var search: Search?
@@ -68,14 +68,14 @@ extension AuthenticatedRoutes {
 				let dtos = try results.map(SheetDTO.init(_:))
 				
 				let context = Context(
-					username: user.username,
+					user: try UserDTO(user),
 					sheets: dtos,
 					search: .init(string: searchString, success: true)
 				)
 				return try await request.view.render("Pages/index", context)
 			} catch let error as SearchError {
 				let context = Context(
-					username: user.username,
+					user: try UserDTO(user),
 					sheets: [],
 					search: .init(string: searchString, success: false, error: error)
 				)
@@ -88,7 +88,7 @@ extension AuthenticatedRoutes {
 				.all()
 			
 			let context = Context(
-				username: user.username,
+				user: try UserDTO(user),
 				sheets: try sheets.map(SheetDTO.init(_:)),
 			)
 			
@@ -98,7 +98,11 @@ extension AuthenticatedRoutes {
 	
 	func upload(request: Request) async throws -> View {
 		let user = try request.auth.require(User.self)
-		return try await request.view.render("Pages/upload", ["username": user.username])
+		guard user.canUpload else {
+			throw Abort(.forbidden)
+		}
+		
+		return try await request.view.render("Pages/upload", ["user": try UserDTO(user)])
 	}
 	
 	func postUpload(request: Request) async throws -> View {
@@ -131,13 +135,16 @@ extension AuthenticatedRoutes {
 				case `internal`
 			}
 			
-			var username: String
+			var user: UserDTO
 			
 			var success: Bool
 			var error: PostError? = nil
 		}
 		
 		let user = try request.auth.require(User.self)
+		guard user.canUpload else {
+			throw Abort(.forbidden)
+		}
 		
 		do {
 			// collect data
@@ -156,23 +163,23 @@ extension AuthenticatedRoutes {
 				try await storage.create(try sheet.requireID(), sheet: uploadData.file)
 			}
 			
-			let context = Context(username: user.username, success: true)
+			let context = Context(user: try UserDTO(user), success: true)
 			return try await request.view.render("Pages/upload", context)
 		} catch _ as NIOTooManyBytesError {
-			let context = Context(username: user.username, success: false, error: .tooLarge)
+			let context = Context(user: try UserDTO(user), success: false, error: .tooLarge)
 			return try await request.view.render("Pages/upload", context)
 		} catch _ as Abort, _ as DecodingError {
-			let context = Context(username: user.username, success: false, error: .unreadable)
+			let context = Context(user: try UserDTO(user), success: false, error: .unreadable)
 			return try await request.view.render("Pages/upload", context)
 		} catch {
-			let context = Context(username: user.username, success: false, error: .internal)
+			let context = Context(user: try UserDTO(user), success: false, error: .internal)
 			return try await request.view.render("Pages/upload", context)
 		}
 	}
 	
 	func getChangePassword(request: Request) async throws -> View {
 		let user = try request.auth.require(User.self)
-		return try await request.view.render("Pages/change-password", ["username": user.username])
+		return try await request.view.render("Pages/change-password", ["user": try UserDTO(user)])
 	}
 	
 	func postChangePassword(request: Request) async throws -> View {
@@ -185,7 +192,7 @@ extension AuthenticatedRoutes {
 		}
 		
 		struct Context: Encodable {
-			var username: String
+			var user: UserDTO
 			var success: Bool
 			var error: PostError? = nil
 		}
@@ -209,30 +216,30 @@ extension AuthenticatedRoutes {
 			let queryData = try await request.decodeBody(Query.self, as: .urlEncodedForm, maxBytes: 2_000) // 2KB
 			
 			guard user.verify(password: queryData.currentPassword) else {
-				let context = Context(username: user.username, success: false, error: .wrong)
+				let context = Context(user: try UserDTO(user), success: false, error: .wrong)
 				return try await request.view.render("Pages/change-password", context)
 			}
 			
 			guard queryData.newPassword == queryData.newPasswordRepeat else {
-				let context = Context(username: user.username, success: false, error: .noMatch)
+				let context = Context(user: try UserDTO(user), success: false, error: .noMatch)
 				return try await request.view.render("Pages/change-password", context)
 			}
 			
 			if queryData.newPassword.isEmpty {
-				let context = Context(username: user.username, success: false, error: .invalid)
+				let context = Context(user: try UserDTO(user), success: false, error: .invalid)
 				return try await request.view.render("Pages/change-password", context)
 			}
 			
 			user.password = User.hashPassword(queryData.newPassword, salt: user.salt)
 			try await user.update(on: request.db)
 			
-			let context = Context(username: user.username, success: true)
+			let context = Context(user: try UserDTO(user), success: true)
 			return try await request.view.render("Pages/change-password", context)
 		} catch _ as NIOTooManyBytesError, _ as Abort, _ as DecodingError {
-			let context = Context(username: user.username, success: false, error: .unreadable)
+			let context = Context(user: try UserDTO(user), success: false, error: .unreadable)
 			return try await request.view.render("Pages/change-password", context)
 		} catch {
-			let context = Context(username: user.username, success: false, error: .internal)
+			let context = Context(user: try UserDTO(user), success: false, error: .internal)
 			return try await request.view.render("Pages/change-password", context)
 		}
 	}

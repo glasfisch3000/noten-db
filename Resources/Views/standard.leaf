@@ -17,7 +17,9 @@
 			<div> </div>
 		</label>
 		
+		#if(user.level == "admin" || user.level == "contributor"):
 		<a id="new-sheet-button" class="header-item symbol" href="/upload?return=#attribute("path", "queryEncoding")"> 􀅼 </a>
+		#endif
 		
 		<label id="login" class="header-item toggle symbol">
 			<input type="checkbox">
@@ -28,7 +30,7 @@
 	</header>
 	
 	<div id="login-dropdown" class="dropdown">
-		<div class="dropdown-item"> #(username) </div>
+		<div class="dropdown-item"> #(user.username) </div>
 		
 		<hr/>
 		

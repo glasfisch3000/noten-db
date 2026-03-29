@@ -3,7 +3,18 @@ import protocol Vapor.Content
 
 struct SheetDTO: Codable, Content {
 	struct Creator: Codable {
+		var id: UUID
 		var username: String
+		
+		init(id: UUID, username: String) {
+			self.id = id
+			self.username = username
+		}
+		
+		init(_ user: User) throws {
+			self.id = try user.requireID()
+			self.username = user.username
+		}
 	}
 	
 	var id: UUID
@@ -25,8 +36,6 @@ struct SheetDTO: Codable, Content {
 		self.title = sheet.title
 		self.composer = sheet.composer
 		self.arranger = sheet.arranger
-		self.creator = sheet.$createdBy.value.flatMap {
-			Self.Creator(username: $0.username)
-		}
+		self.creator = try sheet.$createdBy.value.flatMap(Creator.init(_:))
 	}
 }

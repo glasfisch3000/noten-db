@@ -69,63 +69,68 @@ extension ItemRoutes {
 	// get the confirmation page for deleting a sheet
 	func getDeleteItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var username: String
+			var user: UserDTO
 			var sheet: SheetDTO
 		}
 		
 		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
-		let context = Context(username: user.username, sheet: try .init(sheet))
+		guard try await user.canDelete(sheet, on: request.db) else {
+			throw Abort(.forbidden)
+		}
+		
+		let context = Context(user: try UserDTO(user), sheet: try .init(sheet))
 		return try await request.view.render("Pages/delete-item", context)
 	}
 	
 	// delete a sheet and return a result page
 	func postDeleteItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var username: String
+			var user: UserDTO
 			var success: Bool
 		}
 		
 		let user = try request.auth.require(User.self)
+		let sheet = try await fetchSheet(request)
 		
-		guard let sheetID = request.parameters.get("id", as: UUID.self) else {
-			throw Abort(.notFound)
+		guard try await user.canDelete(sheet, on: request.db) else {
+			throw Abort(.forbidden)
 		}
 		
 		let success: Bool
 		
 		do {
-			try await request.db.transaction { db in
-				try await Sheet.query(on: db)
-					.filter(\.$id == sheetID)
-					.delete(force: false)
-			}
+			try await sheet.delete(force: false, on: request.db)
 			success = true
 		} catch {
 			success = false
 		}
 		
-		let context = Context(username: user.username, success: success)
+		let context = Context(user: try UserDTO(user), success: success)
 		return try await request.view.render("Pages/delete-item", context)
 	}
 	
 	func getEditItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var username: String
+			var user: UserDTO
 			var sheet: SheetDTO
 		}
 		
 		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
-		let context = Context(username: user.username, sheet: try .init(sheet))
+		guard try await user.canEdit(sheet, on: request.db) else {
+			throw Abort(.forbidden)
+		}
+		
+		let context = Context(user: try UserDTO(user), sheet: try .init(sheet))
 		return try await request.view.render("Pages/edit-item", context)
 	}
 	
 	func postEditItem(request: Request) async throws -> View {
 		struct Context: Encodable {
-			var username: String
+			var user: UserDTO
 			var sheet: SheetDTO
 			var success: Bool
 		}
@@ -152,6 +157,10 @@ extension ItemRoutes {
 		let user = try request.auth.require(User.self)
 		let sheet = try await fetchSheet(request)
 		
+		guard try await user.canEdit(sheet, on: request.db) else {
+			throw Abort(.forbidden)
+		}
+		
 		do {
 			// collect data
 			let edit: EditData = try await request.decodeBody(as: .urlEncodedForm, maxBytes: 10_000) // 10KB should be enough
@@ -161,10 +170,10 @@ extension ItemRoutes {
 			sheet.arranger = edit.arranger
 			try await sheet.update(on: request.db)
 			
-			let context = Context(username: user.username, sheet: try .init(sheet), success: true)
+			let context = Context(user: try UserDTO(user), sheet: try .init(sheet), success: true)
 			return try await request.view.render("Pages/edit-item", context)
 		} catch {
-			let context = Context(username: user.username, sheet: try .init(sheet), success: false)
+			let context = Context(user: try UserDTO(user), sheet: try .init(sheet), success: false)
 			return try await request.view.render("Pages/edit-item", context)
 		}
 	}

@@ -39,8 +39,11 @@
 		<div class="sheet-card">
 			<div class="buttons">
 				<a class="sheet-card-button symbol" href="/#(sheet.id)/file.pdf?download=true" download="#(sheet.title).pdf"> 􀅀 </a>
+				
+				#if(user.level == "admin" || user.level == "contributor" && sheet.creator.id == user.id):
 				<a class="sheet-card-button symbol" href="/#(sheet.id)/edit?return=#attribute("path", "queryEncoding")"> 􂽱 </a>
 				<a class="sheet-card-button destructive symbol" href="/#(sheet.id)/delete?return=#attribute("path", "queryEncoding")"> 􀈑 </a>
+				#endif
 			</div>
 			<a href="/#(sheet.id)/file.pdf">
 				<div class="content">

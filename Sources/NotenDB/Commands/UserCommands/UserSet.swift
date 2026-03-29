@@ -8,10 +8,10 @@ extension UserCommands {
 			commandName: "set",
 			abstract: "Change a user's attributes.",
 			usage: """
-				notendb user set [--format <format>] (<username> | -id <userID>) [--username <new-username>] [--password <password>]
+				notendb user set [--format <format>] (<username> | -id <userID>) [--username <new-username>] [--password <password>] [--level <level>]
 				notendb user set (--help | --version)
 				""",
-			version: "0.0.0",
+			version: "0.1.0",
 			shouldDisplay: true,
 			helpNames: .shortAndLong
 		)
@@ -28,13 +28,17 @@ extension UserCommands {
 		@Option(name: [.customShort("u"), .customLong("username")], help: "Set a new username.")
 		var newUsername: String?
 		
-		@Option(name: .shortAndLong, help: "Set a new password.")
-		var password: String?
+		@Option(name: [.customShort("l"), .customLong("level")], help: "Set a new permission level.")
+		var newLevel: User.Level?
+		
+		@Option(name: [.customShort("p"), .customLong("password")], help: "Set a new password.")
+		var newPassword: String?
 		
 		func run() async throws {
 			struct UserDTO: Encodable, Sendable {
 				var id: UUID
 				var username: String
+				var level: User.Level
 			}
 			
 			try await withApplicationDBTransaction { db, _ in
@@ -46,8 +50,12 @@ extension UserCommands {
 					user.username = newUsername
 				}
 				
-				if let password = self.password {
-					user.password = User.hashPassword(password, salt: user.salt)
+				if let newPassword = self.newPassword {
+					user.password = User.hashPassword(newPassword, salt: user.salt)
+				}
+				
+				if let newLevel = self.newLevel {
+					user.level = newLevel
 				}
 				
 				try await user.update(on: db)
@@ -55,6 +63,7 @@ extension UserCommands {
 				let dto = UserDTO(
 					id: try user.requireID(),
 					username: user.username,
+					level: user.level,
 				)
 				
 				// we do this within the transaction so if the output fails, no data is altered

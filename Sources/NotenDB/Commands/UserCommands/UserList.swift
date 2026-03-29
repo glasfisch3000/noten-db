@@ -22,6 +22,7 @@ extension UserCommands {
 			struct UserDTO: Encodable, Sendable {
 				var id: UUID
 				var username: String
+				var level: User.Level
 			}
 			
 			let userDTOs = try await withApplicationDBTransaction { db, _ in
@@ -31,6 +32,7 @@ extension UserCommands {
 						UserDTO(
 							id: try $0.requireID(),
 							username: $0.username,
+							level: $0.level,
 						)
 					}
 			}

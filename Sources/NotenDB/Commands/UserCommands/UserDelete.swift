@@ -29,6 +29,7 @@ extension UserCommands {
 			struct UserDTO: Encodable, Sendable {
 				var id: UUID
 				var username: String
+				var level: User.Level
 			}
 			
 			try await withApplicationDBTransaction { db, _ in
@@ -38,7 +39,8 @@ extension UserCommands {
 				
 				let dto = UserDTO(
 					id: try user.requireID(),
-					username: user.username
+					username: user.username,
+					level: user.level,
 				)
 				
 				try await user.delete(on: db)
