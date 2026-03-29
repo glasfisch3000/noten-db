@@ -22,7 +22,7 @@
 				<input id="username" type="text" required autofocus name="username" placeholder="Benutzername" title="Benutzername" autocomplete="username" inputmode="text"/>
 				
 				<label for="password">Passwort</label>
-				<input id="password" type="password" required name="password" placeholder="Passwort" title="Passwort" autocomplete="password" inputmode="text"/>
+				<input id="password" type="password" required name="password" placeholder="Passwort" title="Passwort" autocomplete="current-password password" inputmode="text"/>
 			</section>
 			
 			<section class="submit-section">
