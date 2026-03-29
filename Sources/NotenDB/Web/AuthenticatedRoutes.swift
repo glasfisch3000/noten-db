@@ -86,6 +86,7 @@ extension AuthenticatedRoutes {
 				.query(on: request.db)
 				.with(\.$createdBy)
 				.all()
+				.sorted()
 			
 			let context = Context(
 				user: try UserDTO(user),
@@ -257,17 +258,9 @@ extension AuthenticatedRoutes {
 	}
 	
 	func search(_ search: String, on db: any Database) async throws -> [Sheet]? {
-		struct Match: Comparable {
+		struct Match {
 			var sheet: Sheet
 			var score: Int
-			
-			static func < (lhs: Match, rhs: Match) -> Bool {
-				lhs.score < rhs.score
-			}
-			
-			static func == (lhs: Match, rhs: Match) -> Bool {
-				lhs.score == rhs.score
-			}
 		}
 		
 		let tokens = tokenize(search)
@@ -293,7 +286,7 @@ extension AuthenticatedRoutes {
 			matches.append(Match(sheet: sheet, score: bestMatch))
 		}
 		
-		return matches.sorted().map(\.sheet)
+		return matches.map(\.sheet).sorted()
 	}
 	
 	// returns the length of the best match
