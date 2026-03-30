@@ -347,7 +347,13 @@ extension AuthenticatedRoutes {
 			matches.append(Match(sheet: sheet, score: bestMatch))
 		}
 		
-		return matches.map(\.sheet).sorted()
+		return matches
+			.sorted {
+				if $0.score < $1.score { return true }
+				if $1.score < $0.score { return false }
+				return $0.sheet < $1.sheet
+			}
+			.map(\.sheet)
 	}
 	
 	// returns the length of the best match
