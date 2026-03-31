@@ -24,22 +24,37 @@
 }
 
 #sheet-info-text {
-	font-weight: bolder;
 	min-width: 0;
 }
 #sheet-info-text > *:not(:last-child) {
 	/* spacing between the lines */
-	margin-bottom: 0.1em;
+	margin-bottom: 0.3em;
 }
 
 #sheet-title {
 	font-size: 140%;
+	font-weight: bolder;
+	overflow-wrap: break-word;
+}
+#sheet-voices {
+	opacity: 80%;
+}
+#sheet-variant {
+	opacity: 80%;
+	font-weight: normal;
+	font-size: 71.43%;
 	overflow-wrap: break-word;
 }
 
-#sheet-composer, #sheet-arranger {
+#sheet-other-info {
+	margin-top: 0.3em;
 	opacity: 80%;
+}
+
+#sheet-composer, #sheet-arranger {
+	font-weight: bolder;
 	overflow-wrap: break-word;
+	opacity: 100%;
 }
 
 #sheet-arranger::before {

@@ -23,15 +23,27 @@
 					<img src="/#(sheet.id)/thumbnail.png">
 				</div>
 				<div id="sheet-info-text">
-					<div id="sheet-title"> #(sheet.title) </div>
+					<div id="sheet-title">
+						#(sheet.title)
+						
+						#if(sheet.voices):
+						<span id="sheet-voices"> [#(sheet.voices)] </span>
+						#endif
+						
+						#if(sheet.variant):
+						<div id="sheet-variant"> #(sheet.variant) </div>
+						#endif
+					</div>
 					
-					#if(sheet.composer):
-					<div id="sheet-composer"> #(sheet.composer) </div>
-					#endif
-					
-					#if(sheet.arranger):
-					<div id="sheet-arranger"> #(sheet.arranger) </div>
-					#endif
+					<div id="sheet-other-info">
+						#if(sheet.composer):
+						<div id="sheet-composer"> #(sheet.composer) </div>
+						#endif
+						
+						#if(sheet.arranger):
+						<div id="sheet-arranger"> #(sheet.arranger) </div>
+						#endif
+					</div>
 				</div>
 			</section>
 			
