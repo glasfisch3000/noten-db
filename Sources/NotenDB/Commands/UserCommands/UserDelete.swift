@@ -43,7 +43,7 @@ extension UserCommands {
 					level: user.level,
 				)
 				
-				try await user.delete(on: db)
+				try await user.delete(force: false, on: db)
 				
 				// we do this within the transaction so if the output fails, no data is altered
 				print(try self.format.format(dto))

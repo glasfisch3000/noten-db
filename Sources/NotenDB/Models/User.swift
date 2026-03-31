@@ -27,6 +27,9 @@ final class User: Model, @unchecked Sendable, ModelSessionAuthenticatable {
 	@Enum(key: "level")
 	var level: Level
 	
+	@Timestamp(key: "deleted_at", on: .delete)
+	var deletedAt: Date?
+	
 	init() { }
 	
 	init(id: UUID? = nil, username: String, salt: UUID = UUID(), password: String, level: Level) {
@@ -35,6 +38,7 @@ final class User: Model, @unchecked Sendable, ModelSessionAuthenticatable {
 		self.salt = salt
 		self.password = Self.hashPassword(password, salt: salt)
 		self.level = level
+		self.deletedAt = nil
 	}
 	
 	static func hashPassword(_ password: String, salt: UUID) -> Data {
@@ -93,7 +97,7 @@ extension User {
 	}
 	
 	struct AddUserLevelMigration: AsyncMigration {
-		var name: String { "NotenDB.AddUserLevelMigration"}
+		var name: String { "NotenDB.AddUserLevelMigration" }
 		
 		func prepare(on database: any Database) async throws {
 			let userLevel = try await database.enum("user_level")
@@ -114,6 +118,22 @@ extension User {
 			
 			try await database.enum("user_level")
 				.delete()
+		}
+	}
+	
+	struct AddSoftDeleteMigration: AsyncMigration {
+		var name: String { "NotenDB.User.AddSoftDeleteMigration" }
+		
+		func prepare(on database: any Database) async throws {
+			try await database.schema("users")
+				.field("deleted_at", .datetime)
+				.update()
+		}
+		
+		func revert(on database: any Database) async throws {
+			try await database.schema("users")
+				.deleteField("deleted_at")
+				.update()
 		}
 	}
 }
