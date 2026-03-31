@@ -2,6 +2,7 @@
 	#export("head"):
 	<link rel="stylesheet" href="/css/standard.css">
 	<link rel="stylesheet" href="/css/dropdown.css">
+	<link rel="stylesheet" href="/css/search.css">
 	#import("standard-head")
 	#endexport
 	
