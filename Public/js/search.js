@@ -55,6 +55,13 @@ async function applySearch(response) {
 			title.textContent = sheet.title
 			info.appendChild(title)
 			
+			if (sheet.variant) {
+				let variant = document.createElement("span")
+				variant.classList.add("item-variant")
+				variant.textContent = ` [${sheet.variant}]`
+				title.appendChild(variant)
+			}
+			
 			if (sheet.composer) {
 				let composer = document.createElement("div")
 				composer.classList.add("item-composer")

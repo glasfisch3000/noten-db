@@ -10,6 +10,9 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 	@Field(key: "title")
 	var title: String
 	
+	@Field(key: "variant")
+	var variant: String?
+	
 	@Field(key: "composer")
 	var composer: String?
 	
@@ -24,9 +27,10 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 	
 	init() { }
 	
-	init(id: UUID? = nil, title: String, composer: String?, arranger: String?, createdBy: User.IDValue) {
+	init(id: UUID? = nil, title: String, variant: String?, composer: String?, arranger: String?, createdBy: User.IDValue) {
 		self.id = id
 		self.title = title
+		self.variant = variant
 		self.composer = composer
 		self.arranger = arranger
 		self.$createdBy.id = createdBy
@@ -37,6 +41,7 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 		if let c = compare(lhs, rhs, path: { $0.title.lowercased() }) { return c }
 		if let c = compare(lhs, rhs, path: { $0.composer?.lowercased() }) { return c }
 		if let c = compare(lhs, rhs, path: { $0.arranger?.lowercased() }) { return c }
+		if let c = compare(lhs, rhs, path: { $0.variant?.lowercased() }) { return c }
 		return compare(lhs, rhs, path: \.id) ?? false
 	}
 	
@@ -44,6 +49,7 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 		lhs.title.lowercased() == rhs.title.lowercased()
 		&& lhs.composer?.lowercased() == rhs.composer?.lowercased()
 		&& lhs.arranger?.lowercased() == rhs.arranger?.lowercased()
+		&& lhs.variant?.lowercased() == rhs.variant?.lowercased()
 		&& lhs.id == rhs.id
 	}
 	
@@ -113,6 +119,22 @@ extension Sheet {
 		func revert(on database: any Database) async throws {
 			try await database.schema("sheets")
 				.deleteField("deleted_at")
+				.update()
+		}
+	}
+	
+	struct AddVariantMigration: AsyncMigration {
+		var name: String { "NotenDB.Sheet.AddVariantMigration" }
+		
+		func prepare(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.field("variant", .string)
+				.update()
+		}
+		
+		func revert(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.deleteField("variant")
 				.update()
 		}
 	}

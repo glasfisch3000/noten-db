@@ -111,6 +111,7 @@ extension AuthenticatedRoutes {
 	func postUpload(request: Request) async throws -> View {
 		struct UploadData: Codable {
 			var title: String
+			var variant: String?
 			var composer: String?
 			var arranger: String?
 			var file: Data
@@ -120,6 +121,9 @@ extension AuthenticatedRoutes {
 				
 				self.title = try container.decode(String.self, forKey: .title)
 				if title.isEmpty { throw RequestError.invalidFormat }
+				
+				self.variant = try container.decodeIfPresent(String.self, forKey: .variant)
+				if let variant, variant.isEmpty { self.variant = nil }
 				
 				self.composer = try container.decodeIfPresent(String.self, forKey: .composer)
 				if let composer, composer.isEmpty { self.composer = nil }
@@ -157,6 +161,7 @@ extension AuthenticatedRoutes {
 			try await request.db.transaction { db in
 				let sheet = Sheet(
 					title: uploadData.title,
+					variant: uploadData.variant,
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
 					createdBy: try user.requireID()
@@ -360,12 +365,14 @@ extension AuthenticatedRoutes {
 	func findMatch(_ tokens: [Substring], index tokenIndex: inout Int, sheet: Sheet) -> Int? {
 		enum Match {
 			case title(start: Int, end: Int)
+			case variant(start: Int, end: Int)
 			case composer(start: Int, end: Int)
 			case arranger(start: Int, end: Int)
 			
 			var length: Int {
 				switch self {
 				case .title(let start, let end): end - start
+				case .variant(let start, let end): end - start
 				case .composer(let start, let end): end - start
 				case .arranger(let start, let end): end - start
 				}
@@ -375,6 +382,7 @@ extension AuthenticatedRoutes {
 		// tokenize the sheet's attributes
 		// treat nonexistent composer/arranger as empty strings
 		let title = tokenize(sheet.title)
+		let variant = sheet.variant.map(tokenize(_:)) ?? []
 		let composer = sheet.composer.map(tokenize(_:)) ?? []
 		let arranger = sheet.arranger.map(tokenize(_:)) ?? []
 		
@@ -390,6 +398,15 @@ extension AuthenticatedRoutes {
 				}
 				
 				return Match.title(start: index, end: index+1)
+			}
+		matches += variant
+			.indexed()
+			.compactMap { index, element in
+				guard element.starts(with: tokens[tokenIndex]) else {
+					return nil
+				}
+				
+				return Match.variant(start: index, end: index+1)
 			}
 		matches += composer
 			.indexed()
@@ -425,6 +442,10 @@ extension AuthenticatedRoutes {
 					guard end < title.count else { continue }
 					guard title[end].starts(with: tokens[tokenIndex]) else { continue }
 					matches[index] = .title(start: start, end: end+1)
+				case .variant(let start, let end):
+					guard end < variant.count else { continue }
+					guard variant[end].starts(with: tokens[tokenIndex]) else { continue }
+					matches[index] = .variant(start: start, end: end+1)
 				case .composer(let start, let end):
 					guard end < composer.count else { continue }
 					guard composer[end].starts(with: tokens[tokenIndex]) else { continue }

@@ -21,6 +21,11 @@
 				<label for="title">Titel</label>
 				<input id="title" type="text" required autofocus name="title" placeholder="Titel" value="#(sheet.title)" title="Titel" inputmode="text"/>
 				
+				<label for="variant">Variante</label>
+				<input id="variant" type="text" name="variant" placeholder="Variante" value="#(sheet.variant)" title="Variante" inputmode="text"/>
+			</section>
+			
+			<section>
 				<label for="composer">Komponist</label>
 				<input id="composer" type="text" name="composer" placeholder="Komponist" value="#(sheet.composer)" title="Komponist" inputmode="text"/>
 				

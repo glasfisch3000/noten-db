@@ -157,6 +157,10 @@
 	overflow-wrap: break-word;
 }
 
+.sheet-card .info .title .variant {
+	opacity: 80%;
+}
+
 .sheet-card .info .other-info {
 	margin-top: 0.3em;
 	font-size: 80%;

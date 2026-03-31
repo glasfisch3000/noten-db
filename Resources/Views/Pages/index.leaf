@@ -52,6 +52,7 @@
 				<div class="info">
 					<div class="title">
 						#(sheet.title)
+						#if(sheet.variant): <span class="variant"> [#(sheet.variant)] </span> #endif
 					</div>
 					
 					<div class="other-info">

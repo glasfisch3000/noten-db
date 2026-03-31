@@ -320,6 +320,9 @@ header:has(> #search-button > input:not(:checked)) ~ #search-container {
 	font-size: 110%;
 	overflow-wrap: break-word;
 }
+.search-item .item-title .item-variant {
+	opacity: 80%;
+}
 .search-item .item-composer, .search-item .item-arranger {
 	opacity: 80%;
 	font-size: 80%;

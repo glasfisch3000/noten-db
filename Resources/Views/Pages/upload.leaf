@@ -19,11 +19,16 @@
 				<label for="title">Titel</label>
 				<input id="title" type="text" required autofocus name="title" placeholder="Titel" title="Titel" inputmode="text"/>
 				
-				<label for="composer">Komponist</label>
-				<input id="composer" type="text" name="composer" placeholder="Komponist" title="Komponist" inputmode="text"/>
-				
+				<label for="variant">Variante</label>
+				<input id="variant" type="text" name="variant" placeholder="Variante" title="Variante" inputmode="text"/>
+			</section>
+			
+			<section>
 				<label for="arranger">Satz</label>
 				<input id="arranger" type="text" name="arranger" placeholder="Satz" title="Satz" inputmode="text"/>
+				
+				<label for="composer">Komponist</label>
+				<input id="composer" type="text" name="composer" placeholder="Komponist" title="Komponist" inputmode="text"/>
 			</section>
 			
 			<section>

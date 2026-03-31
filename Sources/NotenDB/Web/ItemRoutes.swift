@@ -137,6 +137,7 @@ extension ItemRoutes {
 		
 		struct EditData: Codable {
 			var title: String
+			var variant: String?
 			var composer: String?
 			var arranger: String?
 			
@@ -145,6 +146,9 @@ extension ItemRoutes {
 				
 				self.title = try container.decode(String.self, forKey: .title)
 				if title.isEmpty { throw RequestError.invalidFormat }
+				
+				self.variant = try container.decodeIfPresent(String.self, forKey: .variant)
+				if let variant, variant.isEmpty { self.variant = nil }
 				
 				self.composer = try container.decodeIfPresent(String.self, forKey: .composer)
 				if let composer, composer.isEmpty { self.composer = nil }
@@ -166,6 +170,7 @@ extension ItemRoutes {
 			let edit: EditData = try await request.decodeBody(as: .urlEncodedForm, maxBytes: 10_000) // 10KB should be enough
 			
 			sheet.title = edit.title
+			sheet.variant = edit.variant
 			sheet.composer = edit.composer
 			sheet.arranger = edit.arranger
 			try await sheet.update(on: request.db)
