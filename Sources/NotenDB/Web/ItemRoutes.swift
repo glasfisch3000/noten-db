@@ -140,6 +140,7 @@ extension ItemRoutes {
 			var variant: String?
 			var composer: String?
 			var arranger: String?
+			var voices: String?
 			
 			init(from decoder: any Decoder) throws {
 				let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -155,6 +156,9 @@ extension ItemRoutes {
 				
 				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
 				if let arranger, arranger.isEmpty { self.arranger = nil }
+				
+				self.voices = try container.decodeIfPresent(String.self, forKey: .voices)
+				if let voices, voices.isEmpty { self.voices = nil }
 			}
 		}
 		
@@ -173,6 +177,7 @@ extension ItemRoutes {
 			sheet.variant = edit.variant
 			sheet.composer = edit.composer
 			sheet.arranger = edit.arranger
+			sheet.voices = edit.voices
 			try await sheet.update(on: request.db)
 			
 			let context = Context(user: try UserDTO(user), sheet: try .init(sheet), success: true)

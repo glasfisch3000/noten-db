@@ -114,6 +114,7 @@ extension AuthenticatedRoutes {
 			var variant: String?
 			var composer: String?
 			var arranger: String?
+			var voices: String?
 			var file: Data
 			
 			init(from decoder: any Decoder) throws {
@@ -130,6 +131,9 @@ extension AuthenticatedRoutes {
 				
 				self.arranger = try container.decodeIfPresent(String.self, forKey: .arranger)
 				if let arranger, arranger.isEmpty { self.arranger = nil }
+				
+				self.voices = try container.decodeIfPresent(String.self, forKey: .voices)
+				if let voices, voices.isEmpty { self.voices = nil }
 				
 				self.file = try container.decode(Data.self, forKey: .file)
 			}
@@ -164,6 +168,7 @@ extension AuthenticatedRoutes {
 					variant: uploadData.variant,
 					composer: uploadData.composer,
 					arranger: uploadData.arranger,
+					voices: uploadData.voices,
 					createdBy: try user.requireID()
 				)
 				try await sheet.create(on: db)
@@ -368,6 +373,7 @@ extension AuthenticatedRoutes {
 			case variant(start: Int, end: Int)
 			case composer(start: Int, end: Int)
 			case arranger(start: Int, end: Int)
+			case voices(start: Int, end: Int)
 			
 			var length: Int {
 				switch self {
@@ -375,6 +381,7 @@ extension AuthenticatedRoutes {
 				case .variant(let start, let end): end - start
 				case .composer(let start, let end): end - start
 				case .arranger(let start, let end): end - start
+				case .voices(let start, let end): end - start
 				}
 			}
 		}
@@ -385,6 +392,7 @@ extension AuthenticatedRoutes {
 		let variant = sheet.variant.map(tokenize(_:)) ?? []
 		let composer = sheet.composer.map(tokenize(_:)) ?? []
 		let arranger = sheet.arranger.map(tokenize(_:)) ?? []
+		let voices = sheet.voices.map(tokenize(_:)) ?? []
 		
 		var matches = [Match]()
 		var bestMatchLength = 1
@@ -426,6 +434,15 @@ extension AuthenticatedRoutes {
 				
 				return Match.arranger(start: index, end: index+1)
 			}
+		matches += voices
+			.indexed()
+			.compactMap { index, element in
+				guard element.starts(with: tokens[tokenIndex]) else {
+					return nil
+				}
+				
+				return Match.voices(start: index, end: index+1)
+			}
 		
 		// if there are no intial matches, abort
 		if matches.isEmpty {
@@ -454,6 +471,10 @@ extension AuthenticatedRoutes {
 					guard end < arranger.count else { continue }
 					guard arranger[end].starts(with: tokens[tokenIndex]) else { continue }
 					matches[index] = .arranger(start: start, end: end+1)
+				case .voices(let start, let end):
+					guard end < voices.count else { continue }
+					guard voices[end].starts(with: tokens[tokenIndex]) else { continue }
+					matches[index] = .voices(start: start, end: end+1)
 				}
 			}
 			

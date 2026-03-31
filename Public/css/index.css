@@ -156,9 +156,14 @@
 	font-weight: bolder;
 	overflow-wrap: break-word;
 }
-
+.sheet-card .info .title .voices {
+	opacity: 80%;
+}
 .sheet-card .info .title .variant {
 	opacity: 80%;
+	font-weight: normal;
+	font-size: 80%;
+	overflow-wrap: break-word;
 }
 
 .sheet-card .info .other-info {
@@ -170,5 +175,5 @@
 .sheet-card .info .composer, .sheet-card .info .arranger {
 	font-weight: bolder;
 	overflow-wrap: break-word;
-	opacity: 120%;
+	opacity: 100%;
 }

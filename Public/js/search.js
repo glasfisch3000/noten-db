@@ -55,25 +55,38 @@ async function applySearch(response) {
 			title.textContent = sheet.title
 			info.appendChild(title)
 			
+			if (sheet.voices) {
+				let voices = document.createElement("span")
+				voices.classList.add("item-voices")
+				voices.textContent = ` [${sheet.voices}]`
+				title.appendChild(voices)
+			}
+			
 			if (sheet.variant) {
-				let variant = document.createElement("span")
+				let variant = document.createElement("div")
 				variant.classList.add("item-variant")
-				variant.textContent = ` [${sheet.variant}]`
+				variant.textContent = sheet.variant
 				title.appendChild(variant)
 			}
 			
-			if (sheet.composer) {
-				let composer = document.createElement("div")
-				composer.classList.add("item-composer")
-				composer.textContent = sheet.composer
-				info.appendChild(composer)
-			}
-			
-			if (sheet.arranger) {
-				let arranger = document.createElement("div")
-				arranger.classList.add("item-arranger")
-				arranger.textContent = sheet.arranger
-				info.appendChild(arranger)
+			if (sheet.composer || sheet.arranger) {
+				let otherInfo = document.createElement("div")
+				otherInfo.classList.add("item-other-info")
+				info.appendChild(otherInfo)
+				
+				if (sheet.composer) {
+					let composer = document.createElement("div")
+					composer.classList.add("item-composer")
+					composer.textContent = sheet.composer
+					otherInfo.appendChild(composer)
+				}
+				
+				if (sheet.arranger) {
+					let arranger = document.createElement("div")
+					arranger.classList.add("item-arranger")
+					arranger.textContent = sheet.arranger
+					otherInfo.appendChild(arranger)
+				}
 			}
 		}
 	} else {

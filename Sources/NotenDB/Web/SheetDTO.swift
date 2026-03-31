@@ -22,14 +22,16 @@ struct SheetDTO: Codable, Content {
 	var variant: String?
 	var composer: String?
 	var arranger: String?
+	var voices: String?
 	var creator: Creator?
 	
-	init(id: UUID, title: String, variant: String?, composer: String?, arranger: String?, creator: Creator?) {
+	init(id: UUID, title: String, variant: String?, composer: String?, arranger: String?, voices: String?, creator: Creator?) {
 		self.id = id
 		self.title = title
 		self.variant = variant
 		self.composer = composer
 		self.arranger = arranger
+		self.voices = voices
 		self.creator = creator
 	}
 	
@@ -39,6 +41,7 @@ struct SheetDTO: Codable, Content {
 		self.variant = sheet.variant
 		self.composer = sheet.composer
 		self.arranger = sheet.arranger
+		self.voices = sheet.voices
 		self.creator = try sheet.$createdBy.value.flatMap(Creator.init(_:))
 	}
 }

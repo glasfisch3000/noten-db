@@ -19,6 +19,9 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 	@Field(key: "arranger")
 	var arranger: String?
 	
+	@Field(key: "voices")
+	var voices: String?
+	
 	@Parent(key: "created_by")
 	var createdBy: User
 	
@@ -27,12 +30,13 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 	
 	init() { }
 	
-	init(id: UUID? = nil, title: String, variant: String?, composer: String?, arranger: String?, createdBy: User.IDValue) {
+	init(id: UUID? = nil, title: String, variant: String?, composer: String?, arranger: String?, voices: String?, createdBy: User.IDValue) {
 		self.id = id
 		self.title = title
 		self.variant = variant
 		self.composer = composer
 		self.arranger = arranger
+		self.voices = voices
 		self.$createdBy.id = createdBy
 		self.deletedAt = nil
 	}
@@ -42,6 +46,7 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 		if let c = compare(lhs, rhs, path: { $0.composer?.lowercased() }) { return c }
 		if let c = compare(lhs, rhs, path: { $0.arranger?.lowercased() }) { return c }
 		if let c = compare(lhs, rhs, path: { $0.variant?.lowercased() }) { return c }
+		if let c = compare(lhs, rhs, path: { $0.voices?.lowercased() }) { return c }
 		return compare(lhs, rhs, path: \.id) ?? false
 	}
 	
@@ -50,6 +55,7 @@ final class Sheet: Model, @unchecked Sendable, Comparable {
 		&& lhs.composer?.lowercased() == rhs.composer?.lowercased()
 		&& lhs.arranger?.lowercased() == rhs.arranger?.lowercased()
 		&& lhs.variant?.lowercased() == rhs.variant?.lowercased()
+		&& lhs.voices?.lowercased() == rhs.voices?.lowercased()
 		&& lhs.id == rhs.id
 	}
 	
@@ -135,6 +141,22 @@ extension Sheet {
 		func revert(on database: any Database) async throws {
 			try await database.schema("sheets")
 				.deleteField("variant")
+				.update()
+		}
+	}
+	
+	struct AddVoicesMigration: AsyncMigration {
+		var name: String { "NotenDB.Sheet.AddVoicesMigration" }
+		
+		func prepare(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.field("voices", .string)
+				.update()
+		}
+		
+		func revert(on database: any Database) async throws {
+			try await database.schema("sheets")
+				.deleteField("voices")
 				.update()
 		}
 	}

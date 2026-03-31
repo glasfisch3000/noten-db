@@ -52,7 +52,13 @@
 				<div class="info">
 					<div class="title">
 						#(sheet.title)
-						#if(sheet.variant): <span class="variant"> [#(sheet.variant)] </span> #endif
+						#if(sheet.voices):
+						<span class="voices"> [#(sheet.voices)] </span>
+						#endif
+						
+						#if(sheet.variant):
+						<div class="variant"> #(sheet.variant) </div>
+						#endif
 					</div>
 					
 					<div class="other-info">

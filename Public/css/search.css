@@ -144,7 +144,6 @@
 }
 
 .search-item .item-info {
-	font-weight: bolder;
 	min-width: 0;
 }
 .search-item .item-info > *:not(:last-child) {
@@ -153,21 +152,34 @@
 }
 
 .search-item .item-title {
-	font-size: 110%;
+	font-weight: bolder;
 	overflow-wrap: break-word;
+}
+.search-item .item-title .item-voices {
+	opacity: 80%;
 }
 .search-item .item-title .item-variant {
 	opacity: 80%;
+	font-weight: normal;
+	font-size: 75%;
+	overflow-wrap: break-word;
+}
+
+.search-item .item-other-info {
+	margin-top: 0.2em;
+	opacity: 80%;
+	font-size: 75%;
 }
 
 .search-item .item-composer, .search-item .item-arranger {
-	opacity: 80%;
-	font-size: 80%;
+	font-weight: bolder;
 	overflow-wrap: break-word;
+	opacity: 100%;
 }
 
 .search-item .item-arranger::before {
 	content: "Satz: ";
+	opacity: 80%;
 	font-weight: normal;
 }
 
